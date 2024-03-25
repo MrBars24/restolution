@@ -1,0 +1,28 @@
+{
+    "RECORDS": [
+        {
+            "role_id": "1",
+            "role": "Super Admin"
+        },
+        {
+            "role_id": "2",
+            "role": "Corporate Account"
+        },
+        {
+            "role_id": "3",
+            "role": "Branch Manager"
+        },
+        {
+            "role_id": "4",
+            "role": "Kitchen"
+        },
+        {
+            "role_id": "5",
+            "role": "Cashier"
+        },
+        {
+            "role_id": "6",
+            "role": "Waiter"
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "RECORDS": [
+        {
+            "id": "1",
+            "name": "Dine-in"
+        },
+        {
+            "id": "2",
+            "name": "Take-out"
+        }
+    ]
+}

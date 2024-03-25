@@ -1,0 +1,136 @@
+{
+    "RECORDS": [
+        {
+            "role_id": "1",
+            "permission": "Cashier (Viewing)"
+        },
+        {
+            "role_id": "2",
+            "permission": "Cashier (Edit)"
+        },
+        {
+            "role_id": "3",
+            "permission": "Ingredients Input (Viewing)"
+        },
+        {
+            "role_id": "4",
+            "permission": "Ingredients Input (Create)"
+        },
+        {
+            "role_id": "5",
+            "permission": "Ingredients Input (Edit)"
+        },
+        {
+            "role_id": "6",
+            "permission": "Ingredients Summary (Viewing)"
+        },
+        {
+            "role_id": "7",
+            "permission": "Menu Tabs (Viewing)"
+        },
+        {
+            "role_id": "8",
+            "permission": "Menu Tabs (Create)"
+        },
+        {
+            "role_id": "9",
+            "permission": "Menu Tabs (Edit)"
+        },
+        {
+            "role_id": "10",
+            "permission": "Menu Category (Viewing)"
+        },
+        {
+            "role_id": "11",
+            "permission": "Menu Category (Create)"
+        },
+        {
+            "role_id": "12",
+            "permission": "Menu Category (Edit)"
+        },
+        {
+            "role_id": "13",
+            "permission": "Menu (Viewing)"
+        },
+        {
+            "role_id": "14",
+            "permission": "Menu (Create)"
+        },
+        {
+            "role_id": "15",
+            "permission": "Menu (Edit)"
+        },
+        {
+            "role_id": "16",
+            "permission": "Inventory System (Viewing)"
+        },
+        {
+            "role_id": "17",
+            "permission": "Inventory System (Create)"
+        },
+        {
+            "role_id": "19",
+            "permission": "Inventory Actual (Viewing)"
+        },
+        {
+            "role_id": "20",
+            "permission": "Inventory Actual (Create)"
+        },
+        {
+            "role_id": "21",
+            "permission": "Inventory Actual (Edit)"
+        },
+        {
+            "role_id": "22",
+            "permission": "Discount (Viewing)"
+        },
+        {
+            "role_id": "23",
+            "permission": "Discount (Create)"
+        },
+        {
+            "role_id": "24",
+            "permission": "Discount (Edit)"
+        },
+        {
+            "role_id": "25",
+            "permission": "Restaurant (Viewing)"
+        },
+        {
+            "role_id": "26",
+            "permission": "Restaurant (Create)"
+        },
+        {
+            "role_id": "27",
+            "permission": "Restaurant (Edit)"
+        },
+        {
+            "role_id": "28",
+            "permission": "Reservation (Viewing)"
+        },
+        {
+            "role_id": "29",
+            "permission": "Reservation (Create)"
+        },
+        {
+            "role_id": "30",
+            "permission": "Reservation (Edit)"
+        },
+        {
+            "role_id": "31",
+            "permission": "User (Viewing)"
+        },
+        {
+            "role_id": "32",
+            "permission": "User (Create)"
+        },
+        {
+            "role_id": "33",
+            "permission": "User (Edit)"
+        },
+        {
+            "role_id": "34",
+            "permission": "Remaining (Viewing)"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "RECORDS": [
+        {
+            "status": "New Order"
+        },
+        {
+            "status": "In Process"
+        },
+        {
+            "status": "Served"
+        },
+        {
+            "status": "Completed"
+        }
+    ]
+}
