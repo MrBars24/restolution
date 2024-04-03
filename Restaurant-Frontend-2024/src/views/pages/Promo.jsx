@@ -35,8 +35,8 @@ export default function Promo() {
   const getUsers = async () => {
     setLoading(true)
     try {
-      const response = await axiosClient.get(`/web/promo/${user_ID}`)
-      setPromo(response.data)
+      const response = await axiosClient.get(`/web/promo/${user_ID}`);
+      setPromo(response.data.data);
     } catch (error) {
       // Handle error
     } finally {
@@ -154,10 +154,10 @@ export default function Promo() {
 
   return (
     <>
-      <MaterialTable 
+      <MaterialTable
         title=""
         columns={columns}
-        data={promo.data}  
+        data={promo}
         actions={actions}
         options={options}
         isLoading={loading}

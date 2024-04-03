@@ -9,7 +9,7 @@ import CashierTable from '../../tables/CashierTable'
 import { useStateContext } from '../../../contexts/ContextProvider'
 
 export default function Cashier(props) {
-    const { user_ID } = useStateContext();
+    const { user_ID, permission } = useStateContext();
     const navigate = useNavigate()
     const id = props.Data?.id ?? null
     const [hidden, setHidden] = useState(true)
@@ -42,13 +42,23 @@ export default function Cashier(props) {
       time_completed: "",
     })
 
+    useEffect(() => {
+      let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
+
+      let hasEditAccess = permissionsArray.includes('Cashier (Edit)');
+
+      if (hasEditAccess) {
+        setHidden(false);
+      }
+    }, [])
+
     const onSubmit = async (ev) => {
         ev.preventDefault()
         const payload = {...order}
 
         try {
           await axiosClient.put(`/web/order_complete/${id}`, payload);
-  
+
           Swal.fire({
               icon: 'success',
               title: 'Success',
@@ -65,7 +75,7 @@ export default function Cashier(props) {
           }
       }
     }
-    
+
     const onHide = (ev) => {
         setHidden(ev)
     }
@@ -105,13 +115,31 @@ export default function Cashier(props) {
         const dataRow = [...rows];
         dataRow.splice(index, 1);
         initRow(dataRow);
+
+        const subtotal = calculateTotalPrice(dataRow);
+        const discount_amount = parseInt(order.discount_amount ?? 0);
+        const special_amount = parseInt(order.special_discount_amount ?? 0);
+        const discount = (discount_amount + special_amount)
+        const total = (subtotal - discount)
+        const vatSales = (total / 112 * 100).toFixed(2);
+        // setOrder({
+        // ...order,
+        //     menu: data,
+        //     total_amount: subtotal.toFixed(2),
+        //     vat: (total - vatSales).toFixed(2),
+        //     vatable: vatSales,
+        // })
+
         setOrder({
           ...order,
-          menu: dataRow
+          menu: dataRow,
+          total_amount: subtotal.toFixed(2),
+            vat: (total - vatSales).toFixed(2),
+            vatable: vatSales,
         })
       };
 
-    const onValUpdate = (i, event) => {      
+    const onValUpdate = (i, event) => {
         const liElement = event.target;
         const values = liElement.getAttribute('value');
         const names = event.target.getAttribute('name');
@@ -153,12 +181,12 @@ export default function Cashier(props) {
           const MenuName = data.map(item => ({ MenuName: item.name }));
           setMenu(MenuName);
         //   initRow({...rows, IngredientsName: ingredientsName});
-          
+
         } catch (error) {
           console.error("Error fetching client data:", error);
         }
       }
- 
+
     useEffect(() => {
         if (id) {
             getMenu()
@@ -202,7 +230,7 @@ export default function Cashier(props) {
                 <Modal.Title>Order Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-main">
-                    {errors && 
+                    {errors &&
                     <div className="sevices_logo_errors">
                         {Object.keys(errors).map(key => (
                         <p key={key}>{errors[key][0]}</p>
@@ -220,12 +248,12 @@ export default function Cashier(props) {
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Quantity</th>
-                                        <th>price</th> 
+                                        <th>price</th>
                                         <th>Total</th>
                                         <th>
-                                            <button 
+                                            <button
                                             hidden={hidden}
-                                            className="btn btn-primary" 
+                                            className="btn btn-primary"
                                             onClick={(event) => {
                                             event.preventDefault(); // Prevent form submission
                                             addRowTable(); // Call your function to insert a row
@@ -234,7 +262,7 @@ export default function Cashier(props) {
                                             Add
                                             </button>
                                         </th>
-                                        
+
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -274,46 +302,46 @@ export default function Cashier(props) {
                                             />
                                         )}
                                     />
-                                </Col>         
+                                </Col>
                                 <Col xs={12} md={6}>
                                   <TextField
-                                    type="text" 
-                                    value={order.customer_name} 
-                                    onChange={ev => setOrder({...order, customer_name: ev.target.value})} 
-                                    label="Customer Name" 
-                                    variant="outlined" 
+                                    type="text"
+                                    value={order.customer_name}
+                                    onChange={ev => setOrder({...order, customer_name: ev.target.value})}
+                                    label="Customer Name"
+                                    variant="outlined"
                                     fullWidth
                                   />
-                                </Col>                   
+                                </Col>
                             </Row>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                             <Row >
                                 <Col xs={12} md={6}>
-                                </Col>         
+                                </Col>
                                 <Col xs={12} md={6}  style={{ textAlign: 'right' }}>
                                 <Typography>Created Time : {order.time_created}</Typography>
                                 <Typography>Process Time : {order.time_process ?? '-----'}</Typography>
                                 <Typography>Served Time : {order.time_served ?? '-----'}</Typography>
                                 <Typography>Completed Time : {order.time_completed ?? '-----'}</Typography>
-                                </Col>                   
+                                </Col>
                             </Row>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                             <Row >
                                 <Col xs={12} md={6}>
-                                    <Button 
-                                    variant="contained" 
-                                    // disabled={isSubmitting} 
-                                    size="large" 
-                                    color="success" 
-                                    type="submit" 
+                                    <Button
+                                    variant="contained"
+                                    // disabled={isSubmitting}
+                                    size="large"
+                                    color="success"
+                                    type="submit"
                                     >
                                         Paid
                                     </Button>
                                 </Col>
                             </Row>
-                        </Form.Group> 
+                        </Form.Group>
                     </Form>
                 </Modal.Body>
             </Modal>

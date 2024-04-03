@@ -4,6 +4,8 @@ import { Autocomplete, Button, TextField } from '@mui/material'
 import VoidLogin from '../pages/Authentication/VoidLogin';
 import axiosClient from '../../configs/axiosClient';
 import Swal from 'sweetalert2'
+import { useEffect } from 'react';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function CashierTable({ rows, data, menus, tableRowRemove, onValUpdate, onHide }) {
   const rowNames = rows.map((row) => row.name);
@@ -12,6 +14,7 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
   const allIngredientsNames = filteredIngredientsNames.filter((ingredient) => !rowNames.includes(ingredient));
 
   let subTotal = 0;
+  const { permission } = useStateContext();
   const [voucher, setVoucher] = useState()
   const [special, setSpecial] = useState()
   const navigate = useNavigate()
@@ -21,13 +24,23 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
   const [vat, setVat] = useState()
   const [vatable, setVatable] = useState()
   const [hide, setHide] = useState(false)
-  const [hidden, setHidden] = useState(true)
+  const [hidden, setHidden] = useState(true);
+
+  useEffect(() => {
+    let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
+
+    let hasEditAccess = permissionsArray.includes('Cashier (Edit)');
+
+    if (hasEditAccess) {
+      setHidden(false);
+    }
+  }, [])
 
   const handleVoid = (ev) => {
     ev.preventDefault()
 
     setShowModal(true)
-    
+
   }
 
   const onVoid = (ev) => {
@@ -40,20 +53,21 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
 
   const handleUpdate = async (ev) => {
     ev.preventDefault()
-   
+
     const payload = {...data}
 
     try {
-      await axiosClient.put('/web/cashier_update', payload);
+      let update = await axiosClient.put('/web/cashier_update', payload);
+      console.log(update);
 
       Swal.fire({
           icon: 'success',
           title: 'Success',
           text:  'Your data has been successfully saved!',
       }).then(() => {
-        setHide(false)
-        setHidden(true)
-        onHide(true)
+        // setHide(false)
+        // setHidden(true)
+        // onHide(true)
       });
     } catch (err) {
         const response = err.response;
@@ -83,12 +97,12 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
             .then((response) => {
               // Handle the Axios response here
               const item = response.data.data;
-              
+
               setVoucherAmount(item.discount_amount.toFixed(2));
               setTotal((item.total_amount - item.discount_amount).toFixed(2));
               setVat(item.vat.toFixed(2));
               setVatable(item.vatable.toFixed(2));
-      
+
               Swal.fire(
                 'Save!',
                 'Your voucher has been applied.',
@@ -112,7 +126,7 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
 
   const handleSpecial = async (ev) => {
     ev.preventDefault()
-    
+
     try {
       const payload = {...data, special: special}
 
@@ -131,13 +145,13 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
               // Handle the Axios response here
               const item = response.data.data;
               const discount = parseInt(item.discount_amount);
-              const special = parseInt(item.special_discount_amount); 
+              const special = parseInt(item.special_discount_amount);
 
               setSpecialAmount(item.special_discount_amount.toFixed(2));
               setTotal((item.total_amount - (discount + special)).toFixed(2));
               setVat(item.vat.toFixed(2));
               setVatable(item.vatable.toFixed(2));
-      
+
               Swal.fire(
                 'Save!',
                 'Your voucher has been applied.',
@@ -159,8 +173,8 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
     }
   }
 
-  
-  
+
+
   const rowElements = rows.map((rowsData, index) => {
     const  { name, quantity, total, price } = rowsData;
 
@@ -168,7 +182,7 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
       // setDisabled(false)
       onValUpdate(index, event)
     };
-    
+
     const rowNumber = index + 1;
     subTotal += quantity * price;
     return (
@@ -208,7 +222,7 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
           />
         </td>
         <td>
-          <TextField 
+          <TextField
               disabled={hidden}
               required
               type="number"
@@ -218,18 +232,18 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
              />
         </td>
         <td>
-          <TextField 
+          <TextField
               disabled
               value={price}
               onChange={(event) => onValUpdate(index, event)}
               name="price"
-              variant="outlined" 
+              variant="outlined"
              />
         </td>
         <td>
-           <TextField 
+           <TextField
               disabled
-              value={quantity * price} 
+              value={quantity * price}
               onChange={(event) => onValUpdate(index, event)}
               name="Total"
              />
@@ -252,7 +266,7 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
       <td style={{ verticalAlign: 'middle' }}><label htmlFor="">Sub Total:</label></td>
       <td></td>
       <td>
-        
+
       </td>
       <td style={{ verticalAlign: 'middle' }}><label htmlFor="">₱{subTotal}</label></td>
     </tr>
@@ -263,21 +277,20 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
       <td></td>
       <td style={{ verticalAlign: 'middle' }}><label htmlFor="">Voucher Discount:</label></td>
       <td>
-        <TextField 
-            required
+        <TextField
             type="name"
-            value={voucher ?? data.voucher_code ?? ''} 
+            value={voucher ?? data.voucher_code ?? ''}
             onChange={(event) => setVoucher(event.target.value)}
             name="name"
         />
       </td>
-      <td style={{ verticalAlign: 'middle' }}> 
-         <Button 
+      <td style={{ verticalAlign: 'middle' }}>
+         <Button
           onClick={handleVoucher}
           variant="contained"
-          size="large" 
-          color="success" 
-          type="submit" 
+          size="large"
+          color="success"
+          type="submit"
           >
             Apply
         </Button>
@@ -291,21 +304,20 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
       <td></td>
       <td style={{ verticalAlign: 'middle' }}><label htmlFor="">Special Discount:</label></td>
       <td>
-        <TextField 
-            required
+        <TextField
             type="name"
             value={special ?? data.special_code ?? ''}
             onChange={(event) => setSpecial(event.target.value)}
             name="name"
         />
       </td>
-      <td style={{ verticalAlign: 'middle' }}> 
-        <Button 
+      <td style={{ verticalAlign: 'middle' }}>
+        <Button
           onClick={handleSpecial}
           variant="contained"
-          size="large" 
-          color="success" 
-          type="submit" 
+          size="large"
+          color="success"
+          type="submit"
         >
             Apply
         </Button>
@@ -343,34 +355,34 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
   const Void = (
     <tr key="void">
       <td></td>
-      <td> 
-        <Button 
-        variant="contained" 
-        hidden={hide} 
+      <td>
+        <Button
+        variant="contained"
+        hidden={hide}
         onClick={handleVoid}
-        size="medium" 
-        color="error" 
-        type="submit" 
+        size="medium"
+        color="error"
+        type="submit"
         >
           Void
         </Button>
-        <Button 
-        variant="contained" 
-        hidden={hidden} 
+        <Button
+        variant="contained"
+        hidden={hidden}
         onClick={handleUpdate}
-        size="small" 
-        color="success" 
-        type="submit" 
+        size="small"
+        color="success"
+        type="submit"
         >
           Update
         </Button>
       </td>
       <td>
-        
+
       </td>
       <td></td>
       <td>
-       
+
       </td>
     </tr>
   );

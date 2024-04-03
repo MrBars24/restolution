@@ -13,6 +13,7 @@ use App\Models\Restaurant;
 use App\Models\SpecialDiscount;
 use App\Models\UsePromo;
 use App\Models\User;
+use App\Models\UserManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -26,11 +27,11 @@ class OrderController extends Controller
         $order->payment_method = $request->payment_method;
         $order->customer_name = $request->customer_name;
         $order->status = 'Completed';
-        $order->save(); 
+        $order->save();
 
         $tracker = OrderTracker::where('order_id', $request->id)->first();
         $tracker->time_completed = $request->currentTime;
-        $tracker->save(); 
+        $tracker->save();
     }
 
     public function waiter($id)
@@ -52,7 +53,7 @@ class OrderController extends Controller
             return response([
                 'data' => $waiter
             ], 200);
-        }   
+        }
     }
 
     public function special(Request $request)
@@ -70,10 +71,10 @@ class OrderController extends Controller
             $totalDiscountedAmount = (20 / 100) * $sub_total;
             $total = $sub_total - $totalDiscountedAmount;
         }
-        
+
         $VATable = ($total / 112 * 100);
         $VAT = $total - $VATable;
-        
+
         $data = [
             'restaurant_id' => $request->restaurant_id,
             'order_id' => $request->id,
@@ -88,7 +89,7 @@ class OrderController extends Controller
         $order->vatable = $VATable;
         $order->vat = $VAT;
         $order->discount_amount = $request->discount_amount ?? 0;
-        $order->save(); 
+        $order->save();
 
         return response([
             'data' => $order,
@@ -101,11 +102,11 @@ class OrderController extends Controller
         $voucher = Promo::where('restaurant_id', $request->restaurant_id)
                     ->whereRaw('BINARY voucher_code = ?', [$request->voucher])
                     ->first();
-                   
+
         if ($voucher) {
             $limit = UsePromo::where('promo_id', $voucher->id)
                     ->where('restaurant_id', $voucher->restaurant_id)->first();
-    
+
             if ($limit && $voucher->limit === 'SINGLE') {
                 return response([
                     'error' => 'Voucher Code limit has been reached'
@@ -120,27 +121,27 @@ class OrderController extends Controller
             $requestMenu = $request->menu;
             $voucherMenu = $voucher->menu;
 
-       
+
             if ($category === 'SELECTED') {
             // Convert menu data to arrays if needed
                 if (is_string($requestMenu)) {
                     $requestMenu = json_decode($requestMenu, true);
                 }
-                
+
                 if (is_string($voucherMenu)) {
                     $voucherMenu = json_decode($voucherMenu, true);
                 }
-                
+
                 $voucherMenuNames = array_column($voucherMenu, 'name');
                 $foundInRequest = false;
-                
+
                 foreach ($voucherMenuNames as $voucherMenuName) {
                     if (in_array($voucherMenuName, array_column($requestMenu, 'name'))) {
                         $foundInRequest = true;
                         break;
                     }
                 }
-   
+
                 if ($foundInRequest) {
                     if ($category === 'SELECTED') {
                         foreach ($requestMenu as &$menuItem) {
@@ -151,7 +152,7 @@ class OrderController extends Controller
                                         $menuItem['price'] = $discountedPrice;
                                         $totalDiscountedAmount += $discountedPrice;
 
-                                       
+
                                     } else if ($discount_type === 'AMOUNT') {
                                         $discountedPrice = ($menuItem['price'] * $menuItem['quantity']) - $amount_discount;
                                         $menuItem['price'] = $discountedPrice;
@@ -160,9 +161,9 @@ class OrderController extends Controller
                                 }
                             }
                         }
-                    } 
-                } 
-                
+                    }
+                }
+
             } else {
                 if ($discount_type === 'PERCENTAGE') {
                     $discountedPrice = ($amount_discount / 100) * $request->total_amount;
@@ -171,7 +172,7 @@ class OrderController extends Controller
                     $totalDiscountedAmount = $amount_discount;
                 }
             }
-            
+
             $total = $sub_total - $totalDiscountedAmount;
             $VATable = ($total / 112 * 100);
             $VAT = $total - $VATable;
@@ -188,7 +189,7 @@ class OrderController extends Controller
             $order->discount_amount = $totalDiscountedAmount;
             $order->vatable = $VATable;
             $order->vat = $VAT;
-            $order->save(); 
+            $order->save();
 
             return response([
                 'data' => $order,
@@ -206,14 +207,15 @@ class OrderController extends Controller
     {
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
-
+        $restaurant = null;
         if ($role_id == 1) {
             // $restaurant = Restaurant::get();
         } else if ($role_id == 2) {
             $restaurant = Restaurant::where('corporate_account', $id)->first();
 
-        } else if ($role_id == 3) {
-
+        } else if ($role_id == 3 || $role_id == 5) {
+            $item = UserManager::with(['restaurant'])->where("user_id", $id)->first();
+            $restaurant = $item->restaurant;
         } else {
 
         }
@@ -239,7 +241,7 @@ class OrderController extends Controller
                 // Convert the 'menu' column to a JSON-decoded array
                 $menuArray = $order ? json_decode($order->menu, true) : []; // Set to an empty array if there's no menu
                 $waiterArray = $order ? json_decode($order->waiter, true) : []; // Set to an empty array if there's no menu
-                
+
                 $menusString = implode(', ', array_map(function ($menu) {
                     return is_array($menu) && isset($menu['name']) ? $menu['name'] : 'No menu';
                 }, $menuArray));
@@ -248,14 +250,14 @@ class OrderController extends Controller
                     $waitersString = implode(', ', array_map(function ($waiter) {
                         return is_array($waiter) && isset($waiter['fullname']) ? $waiter['fullname'] : 'No waiter';
                     }, $waiterArray));
-                } 
-              
+                }
+
                 // Create an entry for each table, whether or not an order exists
                 $disc_amt = $order->discount_amount ?? 0;
                 $spe_amt = $order->special_discount_amount ?? 0;
                 $discount = $disc_amt + $spe_amt;
                 $amount = intval($order->total_amount ?? 0) - $discount;
-       
+
                 $tableData[] = [
                     'restaurant_name' => $restaurant->name ?? null,
                     'table_number' => $tableNumber ?? null,
@@ -290,7 +292,7 @@ class OrderController extends Controller
             'data' => $tableData
         ], 200);
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -298,7 +300,7 @@ class OrderController extends Controller
     {
         return OrderResource::collection(
             Order::orderBy('id','desc')->get()
-         ); 
+         );
     }
 
     /**
@@ -350,14 +352,14 @@ class OrderController extends Controller
         if ($role_id == 1) {
             return OrderResource::collection(
                 Order::orderBy('id','desc')->get()
-             ); 
+             );
         } else if ($role_id == 2) {
             return OrderResource::collection(
                 Order::join('restaurants', 'restaurants.id', 'categories.restaurant_id')
                         ->select('categories.*')
                         ->where('restaurants.corporate_account', $id)
                         ->orderBy('id','desc')->get()
-             ); 
+             );
         }
     }
 
@@ -369,14 +371,18 @@ class OrderController extends Controller
         $order = Order::find($request->id);
         $order->menu = json_encode($request->menu);
         $order->total_amount = $request->total_amount;
-        $order->discount_amount = $request->discount_amount;
-        $order->special_discount_amount = $request->special_discount_amount ?? 0;
+        if (!empty($request->discount_amount)) {
+            $order->discount_amount = $request->discount_amount;
+        }
+
+        // $order->special_discount_amount = $request->special_discount_amount ?? 0;
         $order->vat = $request->vat;
         $order->vatable = $request->vatable;
-        $order->save(); 
+        $order->save();
 
         return response([
-            'Success' => 'Order successfully updated'
+            'Success' => 'Order successfully updated',
+            'data' => $order
         ], 200);
     }
 
@@ -399,7 +405,7 @@ class OrderController extends Controller
         $order->vat = $request->vat;
         $order->vatable = $request->vatable;
         $order->waiter = json_encode($request->waiter);
-        $order->save(); 
+        $order->save();
 
         return response([
             'Success' => 'User successfully updated'

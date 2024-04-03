@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [],
 
     'allowed_origins_patterns' => [],
 
@@ -31,4 +31,5 @@ return [
 
     'supports_credentials' => false,
 
+    'Access_Control_Allow_Headers' =>  true,
 ];

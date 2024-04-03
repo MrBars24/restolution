@@ -55,14 +55,14 @@ import Minutes from '../../../data/refEstimatedTime.json'
             />
           </td>
           <td>
-            <TextField 
+            <TextField
                 value={quantity}
                 onChange={(event) => onValUpdate(index, event)}
                 name="quantity"
                />
           </td>
           <td>
-             <TextField 
+             <TextField
                 disabled
                 value={unit}
                 onChange={(event) => onValUpdate(index, event)}
@@ -70,12 +70,12 @@ import Minutes from '../../../data/refEstimatedTime.json'
                />
           </td>
           <td>
-            <TextField 
+            <TextField
                 disabled
                 value={price}
                 onChange={(event) => onValUpdate(index, event)}
                 name="price"
-                variant="outlined" 
+                variant="outlined"
                />
           </td>
           <td>
@@ -90,7 +90,7 @@ import Minutes from '../../../data/refEstimatedTime.json'
       );
     });
   }
-  
+
 
 export default function Menu(props) {
   const navigate = useNavigate()
@@ -141,13 +141,13 @@ export default function Menu(props) {
       ingredients: dataRow
     })
   };
-  
+
   const onValUpdate = (i, event) => {
     let name, value;
     const liElement = event.target;
     const values = liElement.getAttribute('value');
     const filteredIngredients = ingredientsFilter.filter(ingredient => ingredient.name === values);
-    
+
     if (event.target.getAttribute('name') === 'name')  {
       name = ['name', 'unit'];
       value = [event.target.getAttribute('value'), filteredIngredients[0].unit];
@@ -155,14 +155,14 @@ export default function Menu(props) {
     } else if (event.target.name === 'quantity') {
       name = [event.target.name, 'price'];
       value = [event.target.value, event.target.value * cost];
-    } 
-    
+    }
+
     const data = [...rows];
     for (let j = 0; j < name.length; j++) {
       data[i][name[j]] = value[j];
     }
     initRow(data);
- 
+
     setMenu({
       ...menu,
       ingredients: data
@@ -180,7 +180,7 @@ export default function Menu(props) {
     }
     reader.readAsDataURL(file)
   }
- 
+
   const handleChangePrep= (event, newValue) => {
     setMenu({
         ...menu,
@@ -232,7 +232,7 @@ export default function Menu(props) {
       const ingredientsName = data.map(item => ({ ingredientsName: item.name }));
       setIngredients(ingredientsName);
       // initRow({...rows, IngredientsName: ingredientsName});
-      
+
     } catch (error) {
       console.error("Error fetching client data:", error);
     }
@@ -243,7 +243,7 @@ export default function Menu(props) {
       const response = await axiosClient.get(`/web/category/${user_ID}`);
       const { data } = response.data;
       setCategory(data);
-      
+
     } catch (error) {
       console.error("Error fetching client data:", error);
     }
@@ -254,12 +254,12 @@ export default function Menu(props) {
       const response = await axiosClient.get(`/web/menutab/${user_ID}`);
       const { data } = response.data;
       setMenuTab(data);
-      
+
     } catch (error) {
       console.error("Error fetching client data:", error);
     }
   }
- 
+
   const onSubmit = async (ev) => {
     ev.preventDefault()
     setIsSubmitting(true);
@@ -332,7 +332,7 @@ export default function Menu(props) {
               <Modal.Title>Menu</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
-              {errors && 
+              {errors &&
                 <div className="sevices_logo_errors">
                   {Object.keys(errors).map(key => (
                     <p key={key}>{errors[key][0]}</p>
@@ -345,22 +345,22 @@ export default function Menu(props) {
                         <Col xs={12} md={6}>
                             <TextField
                                 required
-                                type="text" 
-                                value={menu.name} 
-                                onChange={ev => setMenu({...menu, name: ev.target.value})} 
-                                label="Name" 
-                                variant="outlined" 
+                                type="text"
+                                value={menu.name}
+                                onChange={ev => setMenu({...menu, name: ev.target.value})}
+                                label="Name"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
                         <Col xs={12} md={6}>
-                            <TextField 
+                            <TextField
                                 required
-                                type="number" 
-                                value={menu.price} 
-                                onChange={ev => setMenu({...menu, price: ev.target.value})} 
-                                label="Price" 
-                                variant="outlined" 
+                                type="number"
+                                value={menu.price}
+                                onChange={ev => setMenu({...menu, price: ev.target.value})}
+                                label="Price"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
@@ -410,7 +410,7 @@ export default function Menu(props) {
                                     />
                                 )}
                             />
-                        </Col>  
+                        </Col>
                     </Row>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
@@ -441,7 +441,7 @@ export default function Menu(props) {
                               required
                               multiple
                               value={value}
-                              onChange={handleChangeCategory } 
+                              onChange={handleChangeCategory }
                               options={category}
                               getOptionLabel={(option) => option.name}
                               isOptionEqualToValue={(option, value) => option.name === value.name}
@@ -457,14 +457,14 @@ export default function Menu(props) {
                                 />
                               )}
                             />
-                        </Col>  
+                        </Col>
                     </Row>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                   <Row>
                       <Col xs={12} md={12}>
                           <Card raised >
-                              <CardMedia 
+                              <CardMedia
                                   image={menu.image != null ? menu.image : NoImage}
                                   component="img"
                                   height="200"
@@ -474,13 +474,13 @@ export default function Menu(props) {
                           </Card>
                       </Col>
                       <Col xs={12} md={12} className="mt-2">
-                        <input 
-                          accept=".jpg, .jpeg, .png" 
-                          className="fileUpload" 
-                          name="arquivo" 
-                          id="arquivo" 
-                          type="file" 
-                          onChange={onImageChoose} 
+                        <input
+                          accept=".jpg, .jpeg, .png"
+                          className="fileUpload"
+                          name="arquivo"
+                          id="arquivo"
+                          type="file"
+                          onChange={onImageChoose}
                         />
                       </Col>
                   </Row>
@@ -494,11 +494,11 @@ export default function Menu(props) {
                               <tr>
                                 <th>Name</th>
                                 <th>Quantity</th>
-                                <th>Unit</th> 
-                                <th>price</th> 
+                                <th>Unit</th>
+                                <th>price</th>
                                 <th>
-                                
-                                </th> 
+
+                                </th>
                               </tr>
                             </thead>
                             <tbody>
@@ -510,8 +510,8 @@ export default function Menu(props) {
                               />
                             </tbody>
                           </table>
-                          <button 
-                            className="btn btn-primary" 
+                          <button
+                            className="btn btn-primary"
                             onClick={(event) => {
                               event.preventDefault();
                               addRowTable();
@@ -525,18 +525,18 @@ export default function Menu(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Row >
                     <Col xs={12} md={6}>
-                      <Button 
-                      variant="contained" 
-                      disabled={isSubmitting} 
-                      size="large" 
-                      color="success" 
-                      type="submit" 
+                      <Button
+                      variant="contained"
+                      disabled={isSubmitting}
+                      size="large"
+                      color="success"
+                      type="submit"
                       >
                           Save
                       </Button>
                     </Col>
                 </Row>
-                </Form.Group> 
+                </Form.Group>
                 </Form>
             </Modal.Body>
         </Modal>

@@ -38,7 +38,10 @@ update - url/api/web/category/{id} : put
 destroy - url/api/web/category/{id} : delete
 
 */
- 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE, PATCH');
+header('Access-Control-Allow-Headers: Content-Type, X-Auth-Token, Origin, Authorization, X-Socket-Id');
+
 Route::middleware(['auth:sanctum'])->group(function () {
     // Admin Panel
     Route::resource('/web/users', UserController::class);
@@ -89,7 +92,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
 });
-// Input Voucher Code 
+// Input Voucher Code
 Route::get('/web/voucher/{id}', [PromoController::class, 'voucher']);
 Route::get('/web/voucher_delete', [PromoController::class, 'delete']);
 

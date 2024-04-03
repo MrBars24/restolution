@@ -67,6 +67,7 @@ export default function Ingredients(props) {
                 name: "",
                 unit: "kg",
                 quantity: "",
+                unit_cost: "",
                 cost: "",
                 created_by: user_ID,
             });
@@ -78,10 +79,10 @@ export default function Ingredients(props) {
     <div id="IngredientsModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Tabs</Modal.Title>
+            <Modal.Title>Ingredients</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
-                {errors && 
+                {errors &&
                 <div className="sevices_logo_errors">
                     {Object.keys(errors).map(key => (
                     <p key={key}>{errors[key][0]}</p>
@@ -94,22 +95,22 @@ export default function Ingredients(props) {
                         <Col xs={12} md={6}>
                             <TextField
                                 required
-                                type="text" 
-                                value={ingredients.name} 
-                                onChange={ev => setIngredients({...ingredients, name: ev.target.value})} 
-                                label="Name" 
-                                variant="outlined" 
+                                type="text"
+                                value={ingredients.name}
+                                onChange={ev => setIngredients({...ingredients, name: ev.target.value})}
+                                label="Name"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
                         <Col xs={12} md={6}>
                             <TextField
                                 disabled
-                                type="text" 
+                                type="text"
                                 value="kg"
-                                onChange={ev => setIngredients({...ingredients, unit: ev.target.value})} 
-                                label="Units" 
-                                variant="outlined" 
+                                onChange={ev => setIngredients({...ingredients, unit: ev.target.value})}
+                                label="Units"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
@@ -120,22 +121,22 @@ export default function Ingredients(props) {
                         <Col xs={12} md={6}>
                             <TextField
                                 required
-                                type="number" 
-                                value={ingredients.quantity} 
-                                onChange={ev => setIngredients({...ingredients, quantity: ev.target.value})} 
-                                label="Quantity" 
-                                variant="outlined" 
+                                type="number"
+                                value={ingredients.quantity}
+                                onChange={ev => setIngredients({...ingredients, quantity: ev.target.value})}
+                                label="Quantity"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
                         <Col xs={12} md={6}>
                             <TextField
                                 required
-                                type="number" 
-                                value={ingredients.unit_cost} 
-                                onChange={ev => setIngredients({...ingredients, unit_cost: ev.target.value})} 
-                                label="Cost" 
-                                variant="outlined" 
+                                type="number"
+                                value={ingredients.unit_cost}
+                                onChange={ev => setIngredients({...ingredients, unit_cost: ev.target.value})}
+                                label="Cost"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
@@ -144,18 +145,18 @@ export default function Ingredients(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row >
                         <Col xs={12} md={6}>
-                            <Button 
-                            variant="contained" 
-                            disabled={isSubmitting} 
-                            size="large" 
-                            color="success" 
-                            type="submit" 
+                            <Button
+                            variant="contained"
+                            disabled={isSubmitting}
+                            size="large"
+                            color="success"
+                            type="submit"
                             >
                                 Save
                             </Button>
                         </Col>
                     </Row>
-                </Form.Group> 
+                </Form.Group>
                 </Form>
             </Modal.Body>
         </Modal>
