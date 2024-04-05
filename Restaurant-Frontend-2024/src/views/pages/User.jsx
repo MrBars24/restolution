@@ -129,8 +129,8 @@ export default function User() {
     if (permission) {
       let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
 
-      const hasInputAccess = permissionsArray.includes('Menu (Create)');
-      const hasSummaryAccess = permissionsArray.includes('Menu (Edit)');
+      const hasInputAccess = permissionsArray.includes('User (Create)');
+      const hasSummaryAccess = permissionsArray.includes('User (Edit)');
 
       switch (true) {
         case (hasInputAccess && hasSummaryAccess):
@@ -151,16 +151,16 @@ export default function User() {
 
   return (
     <>
-      <MaterialTable 
+      <MaterialTable
         title=""
         columns={columns}
-        data={users.data}  
+        data={users.data}
         actions={actions}
         options={options}
         isLoading={loading}
       />
       <ModalUser show={showModal} Data={userInfo} close={handleModalClose} />
     </>
-    
+
   )
 }

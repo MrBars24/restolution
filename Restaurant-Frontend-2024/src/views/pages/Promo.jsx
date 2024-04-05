@@ -132,8 +132,8 @@ export default function Promo() {
     if (permission) {
       let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
 
-      const hasInputAccess = permissionsArray.includes('Menu (Create)');
-      const hasSummaryAccess = permissionsArray.includes('Menu (Edit)');
+      const hasInputAccess = permissionsArray.includes('Discount (Create)');
+      const hasSummaryAccess = permissionsArray.includes('Discount (Edit)');
 
       switch (true) {
         case (hasInputAccess && hasSummaryAccess):

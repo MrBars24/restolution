@@ -5,7 +5,7 @@ import ModalTab from '../pages/Modal/Tab'
 import { useLocation } from 'react-router-dom';
 import axiosClient from '../../configs/axiosClient';
 import { useStateContext } from '../../contexts/ContextProvider';
- 
+
 export default function Tab() {
   const { user_ID, permission } = useStateContext();
   const location = useLocation()
@@ -127,13 +127,13 @@ export default function Tab() {
       }
     }
   }, [location.state, permission])
- 
+
   return (
     <>
-      <MaterialTable 
+      <MaterialTable
         title=""
         columns={columns}
-        data={menuTab.data}  
+        data={menuTab.data}
         actions={actions}
         options={options}
         isLoading={loading}

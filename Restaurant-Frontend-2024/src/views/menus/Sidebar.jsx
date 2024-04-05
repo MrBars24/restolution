@@ -41,27 +41,31 @@ export default function Sidebar() {
     const pathParts = window.location.pathname.split('/');
     const path = pathParts[pathParts.length - 1];
     const [filteredSidebarItems, setFilteredSidebarItems] = useState([]);
-    
+
     const handleListItemClick = (text) => {
         setSelectedItem(text);
         navigate('/' + text);
     };
-    
+
     const toggleInventorySubMenu = () => {
         setInventorySubMenuOpen(!isInventorySubMenuOpen);
     };
 
     const subMenuItems = [
-        { text: 'System', icon: <FiberManualRecordIcon fontSize='small' /> },
-        { text: 'Actual', icon: <FiberManualRecordIcon fontSize='small' /> },
-        { text: 'Remaining', icon: <FiberManualRecordIcon fontSize='small' /> },
+        // { text: 'System', icon: <FiberManualRecordIcon fontSize='small' /> },
+        // { text: 'Actual', icon: <FiberManualRecordIcon fontSize='small' /> },
+        // { text: 'Remaining', icon: <FiberManualRecordIcon fontSize='small' /> },
     ];
+
+    if (permission.includes("Inventory System (Viewing)")) subMenuItems.push({ text: 'System', icon: <FiberManualRecordIcon fontSize='small' /> });
+    if (permission.includes("Inventory Actual (Viewing)")) subMenuItems.push({ text: 'Actual', icon: <FiberManualRecordIcon fontSize='small' /> });
+    if (permission.includes("Inventory Remaining (Viewing)")) subMenuItems.push({ text: 'Remaining', icon: <FiberManualRecordIcon fontSize='small' /> });
 
     useEffect(() => {
         if (!selectedItem && path) {
             setSelectedItem(path);
-        } 
-        
+        }
+
         if (permission) {
             let joinedPermissions;
             if (Array.isArray(permission)) {
@@ -78,13 +82,12 @@ export default function Sidebar() {
                     const trimmedPermission = permission.trim();
                     return trimmedPermission.split(' ')[0];
                 });
-                
+
                 joinedPermissions = firstWords.join(', ');
             }
-             
+
             filteredItems = ['Dashboard', 'Cashier', 'Ingredients', 'Menu', 'Order', 'Inventory', 'Discount', 'Restaurant', 'Reservation', 'User', 'Reports']
                 .filter(item => joinedPermissions.trim().includes(item));
-
             setFilteredSidebarItems(filteredItems)
         }
     }, [selectedItem, path, permission]);

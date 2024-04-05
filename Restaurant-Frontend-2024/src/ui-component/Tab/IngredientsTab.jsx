@@ -34,7 +34,7 @@ export default function IngredientsTab() {
 
     const hasInputAccess = result.includes('Ingredients Input');
     const hasSummaryAccess = result.includes('Ingredients Summary');
-    
+
     if (hasInputAccess) {
       SetInputAccess(true);
       if (hasSummaryAccess) {

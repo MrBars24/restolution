@@ -38,30 +38,45 @@ export default function MenuTab() {
     const hasCategoryAccess = result.includes('Menu Category');
     const hasMenuAccess = result.includes('Menu');
 
-    switch (true) {
-      case (hasTabsAccess && hasCategoryAccess && hasMenuAccess):
-        setTabsAccess(true);
-        setCategoryAccess(true);
-        setMenuAccess(true);
-        break;
-      case hasTabsAccess:
-        setTabsAccess(true);
-        setCategoryAccess(false);
-        setMenuAccess(false);
-        break;
-      case hasCategoryAccess:
-        setValue('2');
-        setCategoryAccess(true);
-        setTabsAccess(false);
-        setMenuAccess(false);
-        break;
-      case hasMenuAccess:
-        setValue('3');
-        setMenuAccess(true);
-        setTabsAccess(false);
-        setCategoryAccess(false);
-        break;
+
+    if (hasTabsAccess) {
+      setTabsAccess(true);
     }
+
+    if (hasCategoryAccess) {
+      setValue('2');
+      setCategoryAccess(true);
+    }
+
+    if (hasMenuAccess) {
+      setValue('3');
+      setMenuAccess(true);
+    }
+
+    // switch (true) {
+    //   case (hasTabsAccess && hasCategoryAccess && hasMenuAccess):
+    //     setTabsAccess(true);
+    //     setCategoryAccess(true);
+    //     setMenuAccess(true);
+    //     break;
+    //   case hasTabsAccess:
+    //     setTabsAccess(true);
+    //     setCategoryAccess(false);
+    //     setMenuAccess(false);
+    //     break;
+    //   case hasCategoryAccess:
+    //     setValue('2');
+    //     setCategoryAccess(true);
+    //     setTabsAccess(false);
+    //     setMenuAccess(false);
+    //     break;
+    //   case hasMenuAccess:
+    //     setValue('3');
+    //     setMenuAccess(true);
+    //     setTabsAccess(false);
+    //     setCategoryAccess(false);
+    //     break;
+    // }
   }, [permission]);
 
   return (

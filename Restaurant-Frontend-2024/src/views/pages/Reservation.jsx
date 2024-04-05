@@ -26,7 +26,7 @@ export default function Reservation() {
         notes: "",
       }
     ])
-  
+
     const getRestaurant = async () => {
       setLoading(true)
       try {
@@ -38,7 +38,7 @@ export default function Reservation() {
         setLoading(false);
       }
     }
-  
+
     const handleEditUser = (event,rowData) => {
       setRestaurantInfo({
         id: rowData.id,
@@ -52,7 +52,7 @@ export default function Reservation() {
       });
       setShowModal(true);
     };
-  
+
     const columns = [
       { title: 'Guest Name', field: 'guest_name' },
       { title: 'Table #', field: 'table_number' },
@@ -65,22 +65,22 @@ export default function Reservation() {
       { title: 'Created On', field: 'created_at' },
       // { title: 'Updated At', field: 'updated_at' },
     ];
-  
+
     const actions = [
       {
         icon: () => <div className="btn btn-primary">Add New</div>,
         isFreeAction: true,
         onClick: () => setShowModal(true),
-        // hidden: createAccess ? true : true
+        hidden: createAccess ? false : true
       },
       {
         icon: () => <div className="btn btn-success btn-sm"><EditIcon /></div>,
         tooltip: 'Edit',
         onClick: handleEditUser,
-        // hidden: editAccess ? true : true
+        hidden: editAccess ? false : true
       },
     ];
-  
+
     const options = {
       paging: true,
       pageSize: 5,
@@ -105,26 +105,26 @@ export default function Reservation() {
         fontSize: 16,
       },
     };
-  
+
     const handleModalClose = () => {
       setShowModal(false)
       setRestaurantInfo([])
     }
-  
+
     useEffect(() => {
       getRestaurant()
       if (location.state == 'success'){
         setShowModal(false)
         setRestaurantInfo([])
         location.state = null
-      } 
-  
+      }
+
       if (permission) {
         let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
-  
+
         const hasInputAccess = permissionsArray.includes('Reservation (Create)');
         const hasSummaryAccess = permissionsArray.includes('Reservation (Edit)');
-  
+
         switch (true) {
           case (hasInputAccess && hasSummaryAccess):
               setCreateAccess(true);
@@ -141,13 +141,13 @@ export default function Reservation() {
         }
       }
     }, [location.state, permission])
-  
+
     return (
       <>
-        <MaterialTable 
+        <MaterialTable
           title=""
           columns={columns}
-          data={restaurant.data}  
+          data={restaurant.data}
           actions={actions}
           options={options}
           isLoading={loading}
@@ -156,4 +156,3 @@ export default function Reservation() {
       </>
     )
   }
-  

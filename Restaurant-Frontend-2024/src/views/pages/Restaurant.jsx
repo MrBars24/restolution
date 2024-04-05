@@ -131,13 +131,13 @@ export default function Restaurant() {
       setShowModal(false)
       setRestaurantInfo([])
       location.state = null
-    } 
+    }
 
     if (permission) {
       let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
 
-      const hasInputAccess = permissionsArray.includes('Menu (Create)');
-      const hasSummaryAccess = permissionsArray.includes('Menu (Edit)');
+      const hasInputAccess = permissionsArray.includes('Restaurant (Create)');
+      const hasSummaryAccess = permissionsArray.includes('Restaurant (Edit)');
 
       switch (true) {
         case (hasInputAccess && hasSummaryAccess):
@@ -158,10 +158,10 @@ export default function Restaurant() {
 
   return (
     <>
-      <MaterialTable 
+      <MaterialTable
         title=""
         columns={columns}
-        data={restaurant.data}  
+        data={restaurant.data}
         actions={actions}
         options={options}
         isLoading={loading}
