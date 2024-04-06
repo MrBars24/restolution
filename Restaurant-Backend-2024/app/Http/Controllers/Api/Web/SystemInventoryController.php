@@ -30,9 +30,9 @@ class SystemInventoryController extends Controller
             $restaurant = Restaurant::where('corporate_account', $id)->first();
             $restaurant_id = $restaurant['id'];
             // return $restaurant_id;
-            SystemInventory::where('restaurant_id', $restaurant_id)->where('status', 0)->update(['status' => 1]);
+            SystemInventory::where('restaurant_id', $restaurant_id)->delete();
             $actualInventoryRecords = ActualInventory::where('restaurant_id', $restaurant_id)->get();
- 
+
             foreach ($actualInventoryRecords as $actualInventoryRecord) {
                 SystemInventory::create([
                     'restaurant_id' => $actualInventoryRecord->restaurant_id,
@@ -80,7 +80,7 @@ class SystemInventoryController extends Controller
         $role_id = $user['role_id'];
 
         if ($role_id == 1) {
-            // 
+            //
         } else if ($role_id == 2) {
             $restaurant = Restaurant::where('corporate_account', $user['id'])->first();
             $resto_id = $restaurant['id'];
@@ -110,23 +110,23 @@ class SystemInventoryController extends Controller
             return SystemInventoryResource::collection(
                 SystemInventory::leftjoin('users as created', 'created.id', 'system_inventories.created_by')
                 ->leftjoin('users as updated', 'updated.id', 'system_inventories.updated_by')
-                ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"), 
+                ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"),
                 DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updated_by"))
                 // ->where('system_inventories.status', 0)   // -- error on query
                 ->get()
-             ); 
+             );
         } else if ($role_id == 2) {
             return SystemInventoryResource::collection(
                 SystemInventory::join('restaurants', 'restaurants.id', '=', 'system_inventories.restaurant_id')
                     ->leftjoin('users as created', 'created.id', 'system_inventories.created_by')
                     ->leftjoin('users as updated', 'updated.id', 'system_inventories.updated_by')
-                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
+                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
                     DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
                     ->where('corporate_account', $id)
                     // ->where('system_inventories.status', 0) // -- error on query
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
@@ -135,13 +135,13 @@ class SystemInventoryController extends Controller
                 SystemInventory::join('restaurants', 'restaurants.id', '=', 'system_inventories.restaurant_id')
                 ->leftjoin('users as created', 'created.id', 'system_inventories.created_by')
                 ->leftjoin('users as updated', 'updated.id', 'system_inventories.updated_by')
-                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
+                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
                     DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
                     ->where('restaurants.id', $resto_id)
                     // ->where('system_inventories.status', 0) // -- error on query
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
         }
     }
 
@@ -168,7 +168,7 @@ class SystemInventoryController extends Controller
         $user->unit_cost = $request->unit_cost;
         $user->total_cost = $request->total_cost;
         $user->updated_by = $request->created_by;
-        $user->save(); 
+        $user->save();
 
         return response([
             'Success' => 'System Inventory successfully updated'

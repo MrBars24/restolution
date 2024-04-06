@@ -130,8 +130,8 @@ export default function Actual() {
     setShowVoid(false)
   }
 
-  const onVoid = async (ev) => {
-    const response = await axiosClient.get(`/web/system_inventory_update/${user_ID}`)
+  const onVoid = async (ev, branchUser) => {
+    const response = await axiosClient.get(`/web/system_inventory_update/${branchUser.id}`)
   }
 
   useEffect(() => {
@@ -164,13 +164,13 @@ export default function Actual() {
       }
     }
   }, [location.state, permission])
-  
+
   return (
     <>
-      <MaterialTable 
+      <MaterialTable
         title=""
         columns={columns}
-        data={inventory.data}  
+        data={inventory.data}
         actions={actions}
         options={options}
         isLoading={loading}

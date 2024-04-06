@@ -27,7 +27,7 @@ export default function System() {
       created_by: ""
     }
   ])
- 
+
   const getInventory = async () => {
     setLoading(true)
     try {
@@ -54,12 +54,12 @@ export default function System() {
   // };
 
   const actions = [
-    {
-      icon: () => <div className="btn btn-primary">Add New</div>,
-      isFreeAction: true,
-      onClick: () => setShowModal(true),
-      hidden: createAccess ? false : true
-    },
+    // {
+    //   icon: () => <div className="btn btn-primary">Add New</div>,
+    //   isFreeAction: true,
+    //   onClick: () => setShowModal(true),
+    //   hidden: createAccess ? false : true
+    // },
     // {
     //   icon: () => <div className="btn btn-success btn-sm"><EditIcon /></div>,
     //   tooltip: 'Edit',
@@ -147,10 +147,10 @@ export default function System() {
 
   return (
     <>
-      <MaterialTable 
+      <MaterialTable
         title=""
         columns={columns}
-        data={inventory.data}  
+        data={inventory.data}
         actions={actions}
         options={options}
         isLoading={loading}
@@ -159,4 +159,3 @@ export default function System() {
     </>
   )
 }
- 

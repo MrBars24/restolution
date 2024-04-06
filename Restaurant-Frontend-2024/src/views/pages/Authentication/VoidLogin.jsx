@@ -11,23 +11,25 @@ export default function VoidLogin(props) {
         email: "",
         password: ""
     })
- 
+
     const onSubmit = async (ev) => {
         ev.preventDefault()
         setErrors(null)
         const payload = {...user}
-        
+
         try {
-            await axiosClient.post('/web/void', payload);
-    
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text:  'Your data has been successfully saved!',
-            }).then(() => {
-                props.onVoid('success')
-                props.close(true)
-            });
+            let data = await axiosClient.post('/web/void', payload);
+
+            if ("data" in data.data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text:  'Your data has been successfully saved!',
+                }).then(() => {
+                    props.onVoid('success', data.data.data);
+                    props.close(true)
+                });
+            }
         } catch (err) {
             const response = err.response;
             if (response.status === 422) {
@@ -42,37 +44,37 @@ export default function VoidLogin(props) {
                 <Modal.Header closeButton />
                 <Modal.Body className="modal-main">
                     <Form onSubmit={onSubmit}>
-                        <p className="form-title">Sign-in Manager account</p> 
-                        {errors && 
+                        <p className="form-title">Sign-in Manager account</p>
+                        {errors &&
                             <div className="sevices_logo_errors">
                                 <p>{errors}</p>
                             </div>
                         }
-                            <TextField 
-                                type="email" 
-                                value={user.email} 
-                                onChange={ev => setUser({...user, email: ev.target.value})} 
-                                label="Email" 
-                                variant="outlined" 
+                            <TextField
+                                type="email"
+                                value={user.email}
+                                onChange={ev => setUser({...user, email: ev.target.value})}
+                                label="Email"
+                                variant="outlined"
                                 fullWidth
                                 className='mb-2'
-                            /> 
-                         <TextField 
-                                type="password" 
-                                value={user.password} 
-                                onChange={ev => setUser({...user, password: ev.target.value})} 
-                                label="Password" 
-                                variant="outlined" 
+                            />
+                         <TextField
+                                type="password"
+                                value={user.password}
+                                onChange={ev => setUser({...user, password: ev.target.value})}
+                                label="Password"
+                                variant="outlined"
                                 fullWidth
                                 className='mb-2'
-                            /> 
-                            <Button 
+                            />
+                            <Button
                             fullWidth
-                            variant="contained" 
-                            // disabled={isSubmitting} 
-                            size="large" 
-                            color="primary" 
-                            type="submit" 
+                            variant="contained"
+                            // disabled={isSubmitting}
+                            size="large"
+                            color="primary"
+                            type="submit"
                             >
                                 Login
                             </Button>

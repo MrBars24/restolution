@@ -48,7 +48,7 @@ class UserController extends Controller
     {
         if(Auth::guard('web')->attempt(['email' => request('email'), 'password' => request('password')])){
             $user = Auth::guard('web')->user();
- 
+
             if ($user->role_id <> 1 && $user->role_id <> 2 && $user->role_id <> 3) {
                 return response([
                     'error' => 'You dont have access to void'
@@ -56,7 +56,8 @@ class UserController extends Controller
             }
 
             return response([
-                'success' => 'User found'
+                'success' => 'User found',
+                'data' => $user
             ], 200);
        } else {
             return response([
@@ -64,14 +65,14 @@ class UserController extends Controller
             ], 422);
        }
     }
-    
+
     /**
      * Display User Profile.
      */
     public function corporate_account($id)
     {
         $user = User::find($id);
-        
+
         if ($user->role_id === 1) {
             $users = User::where('role_id', 2)->get();
             if (!$users) {
@@ -117,13 +118,13 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        
+
         $role_id = $request->role_id;
         $data['password'] = bcrypt('welcome@123');
         $data['created_by'] = $request->created_by;
 
 
-        if ($role_id == 1) { 
+        if ($role_id == 1) {
             $user = User::create($data);
             UserPermission::create([
                 'user_id' => $user->id,
@@ -149,12 +150,12 @@ class UserController extends Controller
 
                     $str1 = str_pad($number, 2, '0', STR_PAD_LEFT);
                     $reference_id = $letter . $str1;
-                
+
             } else {
                 $reference_id = 'A00';
             }
             $data['reference_number'] = $reference_id;
-            
+
             $user = User::create($data);
             CorporateRestriction::create([
                 'user_id' => $user->id,
@@ -169,7 +170,7 @@ class UserController extends Controller
             $user = User::create($data);
             UserManager::create([
                 'user_id' => $user->id,
-                'restaurant_id' => $request->restaurant_id    
+                'restaurant_id' => $request->restaurant_id
             ]);
             UserPermission::create([
                 'user_id' => $user->id,
@@ -200,12 +201,12 @@ class UserController extends Controller
                     ->leftjoin('corporate_restrictions', 'corporate_restrictions.user_id', 'users.id')
                     ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name', 'corporate_restrictions.allowed_restaurant', 'corporate_restrictions.allowed_bm')
                     ->orderBy('id','desc')->get()
-             ); 
+             );
         } else if ($role_id == 2) {
             $restaurant = Restaurant::where('corporate_account', $id)->first();
             $resto_id = $restaurant['id'];
 
- 
+
             return UserResource::collection(
                 User::leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
                     ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
@@ -213,7 +214,7 @@ class UserController extends Controller
                     ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name')
                     ->where('restaurants.id', $resto_id)
                     ->orderBy('id','desc')->get()
-             );  
+             );
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
@@ -224,9 +225,9 @@ class UserController extends Controller
                     ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name')
                     ->where('restaurants.id', $resto_id)
                     ->orderBy('id','desc')->get()
-             );  
+             );
         }
-        
+
     }
 
     /**
@@ -242,11 +243,11 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->role_id = $request->role_id;
         $user->status = $request->status;
-        $user->save(); 
- 
-  
+        $user->save();
+
+
         $permissions = UserPermission::where('user_id', $request->id)->first();
-    
+
         if ($permissions) {
             $permissions->permission = json_encode($request->permission);
             $permissions->save();
