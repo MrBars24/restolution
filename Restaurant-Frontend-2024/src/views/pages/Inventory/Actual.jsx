@@ -7,6 +7,7 @@ import axiosClient from '../../../configs/axiosClient';
 import ActualSystem from '../Modal/Actual'
 import VoidLogin from '../Authentication/VoidLogin';
 import Swal from 'sweetalert2'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 export default function Actual() {
   const { user_ID, permission } = useStateContext();
@@ -16,6 +17,7 @@ export default function Actual() {
   const [showVoid, setShowVoid] = useState(false);
   const [createAccess, setCreateAccess] = useState(false);
   const [editAccess, setEditAccess] = useState(false);
+  const [updateAccess, setUpdateAccess] = useState(false);
   const [inventory, setInventory] = useState([])
   const [inventoryInfo, setInventoryInfo] = useState([
     {
@@ -64,7 +66,7 @@ export default function Actual() {
       icon: () => <div className="btn btn-warning">Update</div>,
       isFreeAction: true,
       onClick: handleUpdate,
-      // hidden: createAccess ? false : true
+      hidden: updateAccess ? false : true
     },
     {
       icon: () => <div className="btn btn-primary">Add New</div>,
@@ -130,8 +132,19 @@ export default function Actual() {
     setShowVoid(false)
   }
 
-  const onVoid = async (ev, branchUser) => {
-    const response = await axiosClient.get(`/web/system_inventory_update/${branchUser.id}`)
+  const onVoid = async () => {
+    const response = await axiosClient.get(`/web/system_inventory_update/${user_ID}`)
+
+    if (response) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Inventory successfully updated.',
+      }).then(() => {
+      });
+    }
+
+    setShowVoid(false);
   }
 
   useEffect(() => {
@@ -145,23 +158,36 @@ export default function Actual() {
     if (permission) {
       let permissionsArray = Array.isArray(permission) ? permission : permission.split(',');
 
-      const hasInputAccess = permissionsArray.includes('Menu (Create)');
-      const hasSummaryAccess = permissionsArray.includes('Menu (Edit)');
+      const hasCreateAccess = permissionsArray.includes('Inventory Actual (Create)');
+      const hasEditAccess = permissionsArray.includes('Inventory Actual (Edit)');
+      const hasUpdateAccess = permissionsArray.includes('Inventory System (Create)');
 
-      switch (true) {
-        case (hasInputAccess && hasSummaryAccess):
-            setCreateAccess(true);
-            setEditAccess(true);
-            break;
-        case hasInputAccess:
-            setCreateAccess(true);
-            setEditAccess(false);
-            break;
-        case hasSummaryAccess:
-            setCreateAccess(false);
-            setEditAccess(true);
-            break;
+      if (hasCreateAccess) {
+        setCreateAccess(true);
       }
+
+      if (hasEditAccess) {
+        setEditAccess(true);
+      }
+
+      if (hasUpdateAccess) {
+        setUpdateAccess(true);
+      }
+
+      // switch (true) {
+      //   case (hasInputAccess && hasSummaryAccess):
+      //       setCreateAccess(true);
+      //       setEditAccess(true);
+      //       break;
+      //   case hasInputAccess:
+      //       setCreateAccess(true);
+      //       setEditAccess(false);
+      //       break;
+      //   case hasSummaryAccess:
+      //       setCreateAccess(false);
+      //       setEditAccess(true);
+      //       break;
+      // }
     }
   }, [location.state, permission])
 
@@ -176,7 +202,27 @@ export default function Actual() {
         isLoading={loading}
       />
       <ActualSystem show={showModal} Data={inventoryInfo} close={handleModalClose} />
-      <VoidLogin show={showVoid} onVoid={onVoid} close={handleVoidClose} />
+      {/* <VoidLogin show={showVoid} onVoid={onVoid} close={handleVoidClose} /> */}
+      <Dialog
+        open={showVoid}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Update Inventory"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to update system inventory?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowVoid(false)}>Close</Button>
+          <Button onClick={onVoid} autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

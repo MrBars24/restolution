@@ -28,18 +28,18 @@ class DatabaseSeeder extends Seeder
                 'email' => 'ramcap2024@gmail.com',
                 'password' => bcrypt('welcome@123'),
                 'image' => null,
-                'created_at' => now(), 
-                'updated_at' => now(), 
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         ]);
 
         \App\Models\UserPermission::insert([
             [
-                
+
                 'user_id' => '1',
-                'permission' => '["Cashier (Viewing)","Cashier (Edit)","Ingredients Input (Viewing)","Ingredients Input (Create)","Ingredients Input (Edit)","Ingredients Summary (Viewing)","Menu Tabs (Viewing)","Menu Tabs (Create)","Menu Tabs (Edit)","Menu Category (Viewing)","Menu Category (Create)","Menu Category (Edit)","Menu (Viewing)","Menu (Create)","Menu (Edit)","Inventory System (Viewing)","Inventory System (Create)","Inventory System (Edit)","Inventory Actual (Viewing)","Inventory Actual (Create)","Inventory Actual (Edit)","Discount (Viewing)","Discount (Create)","Discount (Edit)","Restaurant (Viewing)","Restaurant (Create)","Restaurant (Edit)","User (Viewing)","User (Create)","User (Edit)"]',
-                'created_at' => now(), 
-                'updated_at' => now(), 
+                'permission' => '["Cashier (Edit)","Cashier (Viewing)","Ingredients Input (Viewing)","Ingredients Summary (Viewing)","Ingredients Input (Create)","Ingredients Input (Edit)","Menu Tabs (Viewing)","Menu Tabs (Create)","Menu Tabs (Edit)","Menu Category (Viewing)","Menu Category (Create)","Menu Category (Edit)","Menu (Viewing)","Menu (Create)","Menu (Edit)","Inventory System (Viewing)","Inventory System (Create)","Inventory Actual (Viewing)","Inventory Actual (Create)","Inventory Actual (Edit)","Discount (Viewing)","Discount (Create)","Discount (Edit)","Restaurant (Viewing)","Restaurant (Create)","Restaurant (Edit)","Reservation (Viewing)","Reservation (Create)","Reservation (Edit)","User (Viewing)","User (Create)","User (Edit)","Inventory Remaining (Viewing)"]',
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         ]);
     }
