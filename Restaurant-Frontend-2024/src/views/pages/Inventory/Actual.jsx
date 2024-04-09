@@ -133,18 +133,23 @@ export default function Actual() {
   }
 
   const onVoid = async () => {
-    const response = await axiosClient.get(`/web/system_inventory_update/${user_ID}`)
+    try {
+      const response = await axiosClient.get(`/web/system_inventory_update/${user_ID}`)
 
-    if (response) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Inventory successfully updated.',
-      }).then(() => {
-      });
+      if (response) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Inventory successfully updated.',
+        }).then(() => {
+        });
+      }
+
+      setShowVoid(false);
+    } catch (e){
+      setShowVoid(false);
+
     }
-
-    setShowVoid(false);
   }
 
   useEffect(() => {

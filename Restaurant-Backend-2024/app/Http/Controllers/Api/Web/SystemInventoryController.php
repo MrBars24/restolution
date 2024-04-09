@@ -21,13 +21,21 @@ class SystemInventoryController extends Controller
      */
     public function update_inventory($id)
     {
-        $user = User::where('id', $id)->first();
+        $user = User::with("permissions")->where('id', $id)->first();
         $role_id = $user['role_id'];
 
         if ($role_id == 1) {
-            return '1';
-        } else if ($role_id == 2) {
-            $restaurant = Restaurant::where('corporate_account', $id)->first();
+            return response()->json(['error' => "No restaurant is selected"], 403);
+        }
+
+        if (in_array("Inventory Actual (Create)", json_decode($user->permissions->permission))) {
+            if ($role_id == 2) {
+                $restaurant = Restaurant::where('corporate_account', $id)->first();
+            } else if ($role_id > 2) {
+                $item = UserManager::with(['restaurant'])->where("user_id", $id)->first();
+                $restaurant = $item->restaurant;
+            }
+
             $restaurant_id = $restaurant['id'];
             // return $restaurant_id;
             SystemInventory::where('restaurant_id', $restaurant_id)->delete();
@@ -49,10 +57,9 @@ class SystemInventoryController extends Controller
             return response([
                 'message' => 'System Inventory successfully updated'
             ], 200);
-        } else {
-            return '3';
         }
 
+        return null;
     }
     /**
      * Display a listing of the resource.
