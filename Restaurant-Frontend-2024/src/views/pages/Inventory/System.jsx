@@ -76,12 +76,12 @@ export default function System() {
     { title: 'Total Cost', field: 'total_cost' },
     // { title: 'Created by', field: 'created_by' },
     { title: 'Created On', field: 'created_at' },
-    // { title: 'Updated By', field: 'updated_by' },
-    // {
-    //   field: "updated_at",
-    //   title: "Date Updated",
-    //   render: (rowData) => rowData.updated_by ? rowData.updated_at : null,
-    // },
+    { title: 'Updated By', field: 'updated_by' },
+    {
+      field: "updated_at",
+      title: "Date Updated",
+      render: (rowData) => rowData.updated_by ? rowData.updated_at : null,
+    },
   ]
 
   const options = {

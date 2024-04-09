@@ -53,7 +53,7 @@ export default function Promo(props) {
 
     const handleCheckboxSingleChange = (event) => {
         const checked = event.target.checked;
-  
+
         setCheckboxSingleChecked(checked);
         if (checked) {
           setCheckboxMultipleChecked(false);
@@ -63,10 +63,10 @@ export default function Promo(props) {
           })
         }
       };
-  
+
       const handleCheckboxMultipleChange = (event) => {
         const checked = event.target.checked;
-  
+
         setCheckboxMultipleChecked(checked);
         if (checked) {
           setCheckboxSingleChecked(false);
@@ -83,7 +83,7 @@ export default function Promo(props) {
             restaurant_id: newValue.id,
             restaurant_name: newValue.name,
             refID: newValue.refid,
-        }) 
+        })
         getMenu(newValue.id)
     };
 
@@ -92,7 +92,7 @@ export default function Promo(props) {
             id: option.id,
           name: option.name
         }));
-      
+
         setValue([...fixedOptions, ...extractedData]);
         setPromo({
           ...promo,
@@ -115,7 +115,7 @@ export default function Promo(props) {
           ])
         }
       };
-  
+
       const handleCheckbox2Change = (event) => {
         const checked = event.target.checked;
         setCheckbox2Checked(checked);
@@ -125,12 +125,12 @@ export default function Promo(props) {
             ...promo,
             category: 'SELECTED',
           })
-        } 
+        }
       };
 
       const handleCheckboxPercentChange = (event) => {
         const checked = event.target.checked;
-  
+
         setCheckboxPercentChecked(checked);
         if (checked) {
           setCheckboxAmountChecked(false);
@@ -145,10 +145,10 @@ export default function Promo(props) {
             })
         }
       };
-  
+
       const handleCheckboxAmountChange = (event) => {
         const checked = event.target.checked;
-  
+
         setCheckboxAmountChecked(checked);
         if (checked) {
           setCheckboxPercentChecked(false);
@@ -169,17 +169,18 @@ export default function Promo(props) {
             const { data } = await axiosClient.get(`/web/restaurant/menu/${id}`)
             setMenu(data.data)
         } catch (error) {
-  
+
         }
     }
 
       const getRestaurant= async () => {
         try {
-          const { data } = await axiosClient.get(`/web/restaurant_refid/${user_ID}`)
-          setRestaurant(data.data)
+          const { data } = await axiosClient.get(`/web/restaurant_refid/${user_ID}`);
+          let tmp = Array.isArray(data.data) ? data.data : [data.data];
+          setRestaurant(tmp);
         //   console.log(data.data.refid)
         } catch (error) {
-  
+
         }
       }
 
@@ -195,7 +196,7 @@ export default function Promo(props) {
           const dtday = ('0' + dt.getDate()).slice(-2);
           const datefrom = `${dfyear}/${dfmonth}/${dfday}`;
           const dateto = `${dtyear}/${dtmonth}/${dtday}`;
-  
+
           setPromo({
             ...promo,
               datefrom: datefrom,
@@ -213,10 +214,10 @@ export default function Promo(props) {
         console.log(payload)
 
         try {
-            const response = id 
-            ? await axiosClient.put(`/web/promo/${id}`, payload) 
+            const response = id
+            ? await axiosClient.put(`/web/promo/${id}`, payload)
             : await axiosClient.post('/web/promo', payload);
-    
+
             Swal.fire({
               icon: 'success',
               title: 'Success',
@@ -258,7 +259,7 @@ export default function Promo(props) {
             setCheckbox2Checked(true)
             setCheckbox1Checked(false)
             }
-    
+
             if (props.Data.limit == "SINGLE") {
             setCheckboxSingleChecked(true)
             setCheckboxMultipleChecked(false)
@@ -266,7 +267,7 @@ export default function Promo(props) {
             setCheckboxMultipleChecked(true)
             setCheckboxSingleChecked(false)
             }
-    
+
             if (props.Data.discount_type == "PERCENTAGE") {
             setCheckboxPercentChecked(true)
             setCheckboxAmountChecked(false)
@@ -315,7 +316,7 @@ export default function Promo(props) {
             <Modal.Title>DIscount</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
-            {errors && 
+            {errors &&
                     <div className="sevices_logo_errors">
                     {Object.keys(errors).map(key => (
                         <p key={key}>{errors[key][0]}</p>
@@ -328,7 +329,7 @@ export default function Promo(props) {
                     <Col xs={12} md={6}>
                     <FormControlLabel
                         value="SINGLE"
-                        control={ 
+                        control={
                         <Checkbox
                             checked={checkboxSingleChecked}
                             onChange={handleCheckboxSingleChange}
@@ -381,7 +382,7 @@ export default function Promo(props) {
                     <Col xs={12} md={6}>
                     <FormControlLabel
                         value="ALL_SERVICES"
-                        control={ 
+                        control={
                         <Checkbox
                             checked={checkbox1Checked}
                             onChange={handleCheckbox1Change}
@@ -404,7 +405,7 @@ export default function Promo(props) {
                     </Col>
                 </Row>
             </Form.Group>
-            
+
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Row>
                 <Col xs={12} md={12}>
@@ -412,7 +413,7 @@ export default function Promo(props) {
                         disabled={!checkbox2Checked}
                         multiple
                         value={value}
-                        onChange={ handleChangeMenu } 
+                        onChange={ handleChangeMenu }
                         options={menu}
                         getOptionLabel={(option) =>  option.name}
                         isOptionEqualToValue={(option, value) => option.name === value.name}
@@ -431,7 +432,7 @@ export default function Promo(props) {
                     </Col>
                 </Row>
             </Form.Group>
-            
+
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Row>
                             <Col xs={12} md={12}>
@@ -454,42 +455,42 @@ export default function Promo(props) {
                             </Col>
                         </Row>
             </Form.Group>
-            
+
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Row>
                     <Col xs={12} md={6}>
-                        <TextField 
+                        <TextField
                             required
-                            type="text" 
+                            type="text"
                             value={promo.voucher_name}
                             onChange={ev => {
                               const upperCaseValue = ev.target.value.toUpperCase();
                               setPromo({...promo, voucher_name: upperCaseValue, voucher_code: promo.refID + upperCaseValue});
-                            }} 
-                            label="Voucher Name" 
-                            variant="outlined" 
+                            }}
+                            label="Voucher Name"
+                            variant="outlined"
                             fullWidth
-                        /> 
+                        />
                     </Col>
                     <Col xs={12} md={6}  >
-                        <TextField 
+                        <TextField
                             disabled
-                            type="text" 
+                            type="text"
                             value={promo.voucher_code}
-                            label="Voucher Code" 
-                            variant="outlined" 
+                            label="Voucher Code"
+                            variant="outlined"
                             fullWidth
-                        /> 
+                        />
                     </Col>
                 </Row>
             </Form.Group>
-            
+
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Row>
                     <Col xs={12} md={6}>
                     <FormControlLabel
                         value="PERCENTAGE"
-                        control={ 
+                        control={
                         <Checkbox
                             checked={checkboxPercentChecked}
                             onChange={handleCheckboxPercentChange}
@@ -512,7 +513,7 @@ export default function Promo(props) {
                     </Col>
                 </Row>
             </Form.Group>
-            
+
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row>
                 <Col xs={12} md={12}>
@@ -520,7 +521,7 @@ export default function Promo(props) {
                         required
                         type= "number"
                         value={promo.discount_amount}
-                        onChange={ev => setPromo({...promo, discount_amount: ev.target.value})} 
+                        onChange={ev => setPromo({...promo, discount_amount: ev.target.value})}
                         label="Discount Percentage / Amount"
                         variant="outlined"
                         fullWidth
@@ -536,9 +537,9 @@ export default function Promo(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row >
                 <Col xs={12} md={12}>
-                  <Button 
-                    variant="success"  
-                    type="submit" 
+                  <Button
+                    variant="success"
+                    type="submit"
                     disabled={isSubmitting}
                   >
                   {id ? 'Save Changes' : 'Save'}
