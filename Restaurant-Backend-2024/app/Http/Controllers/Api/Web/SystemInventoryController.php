@@ -128,8 +128,8 @@ class SystemInventoryController extends Controller
                 SystemInventory::join('restaurants', 'restaurants.id', '=', 'system_inventories.restaurant_id')
                     ->leftjoin('users as created', 'created.id', 'system_inventories.created_by')
                     ->leftjoin('users as updated', 'updated.id', 'system_inventories.updated_by')
-                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
-                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
+                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"),
+                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updated_by"))
                     ->where('corporate_account', $id)
                     // ->where('system_inventories.status', 0) // -- error on query
                     ->orderBy('id','desc')
@@ -143,8 +143,8 @@ class SystemInventoryController extends Controller
                 SystemInventory::join('restaurants', 'restaurants.id', '=', 'system_inventories.restaurant_id')
                 ->leftjoin('users as created', 'created.id', 'system_inventories.created_by')
                 ->leftjoin('users as updated', 'updated.id', 'system_inventories.updated_by')
-                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
-                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
+                    ->select('system_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"),
+                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updated_by"))
                     ->where('restaurants.id', $resto_id)
                     // ->where('system_inventories.status', 0) // -- error on query
                     ->orderBy('id','desc')
