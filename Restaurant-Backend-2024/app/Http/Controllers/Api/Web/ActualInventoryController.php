@@ -72,21 +72,21 @@ class ActualInventoryController extends Controller
             return ActualInventoryResource::collection(
                 ActualInventory::leftjoin('users as created', 'created.id', 'actual_inventories.created_by')
                 ->leftjoin('users as updated', 'updated.id', 'actual_inventories.updated_by')
-                ->select('actual_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"), 
+                ->select('actual_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"),
                 DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updated_by"))
                 ->get()
-             ); 
+             );
         } else if ($role_id == 2) {
             return ActualInventoryResource::collection(
                 ActualInventory::join('restaurants', 'restaurants.id', '=', 'actual_inventories.restaurant_id')
                     ->leftjoin('users as created', 'created.id', 'actual_inventories.created_by')
                     ->leftjoin('users as updated', 'updated.id', 'actual_inventories.created_by')
-                    ->select('actual_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
-                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
+                    ->select('actual_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"),
+                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updated_by"))
                     ->where('corporate_account', $id)
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
@@ -95,12 +95,12 @@ class ActualInventoryController extends Controller
                 ActualInventory::join('restaurants', 'restaurants.id', '=', 'actual_inventories.restaurant_id')
                 ->leftjoin('users as created', 'created.id', 'actual_inventories.created_by')
                 ->leftjoin('users as updated', 'updated.id', 'actual_inventories.created_by')
-                    ->select('actual_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
-                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
+                    ->select('actual_inventories.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as created_by"),
+                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updated_by"))
                     ->where('restaurants.id', $resto_id)
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
         }
     }
 
@@ -127,7 +127,7 @@ class ActualInventoryController extends Controller
         $user->unit_cost = $request->unit_cost;
         $user->total_cost = $request->total_cost;
         $user->updated_by = $request->created_by;
-        $user->save(); 
+        $user->save();
 
         return response([
             'Success' => 'System Inventory successfully updated'

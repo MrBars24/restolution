@@ -81,7 +81,7 @@ class ReserveController extends Controller
                     ->leftjoin('users as updated', 'updated.id', 'reservations.updated_by')
                     ->select('reservations.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
                     ->orderBy('id','desc')->get()
-             ); 
+             );
         } else if ($role_id == 2) {
             return ReservationResource::collection(
                 Reservation::join('restaurants', 'restaurants.id', 'reservations.restaurant_id')
@@ -91,7 +91,20 @@ class ReserveController extends Controller
                     ->where('restaurants.corporate_account', $id)
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
+        } else if ($role_id > 2) {
+            $item = UserManager::with(['restaurant'])->where("user_id", $id)->first();
+            $restaurant = $item->restaurant;
+
+            return ReservationResource::collection(
+                Reservation::join('restaurants', 'restaurants.id', 'reservations.restaurant_id')
+                    ->leftjoin('users as created', 'created.id', 'reservations.created_by')
+                    ->leftjoin('users as updated', 'updated.id', 'reservations.updated_by')
+                    ->select('reservations.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"))
+                    ->where('restaurants.corporate_account', $restaurant->corporate_account)
+                    ->orderBy('id','desc')
+                    ->get()
+             );
         }
     }
 

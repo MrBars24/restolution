@@ -50,6 +50,7 @@ class SystemInventoryController extends Controller
                     'unit_cost' => $actualInventoryRecord->unit_cost,
                     'total_cost' => $actualInventoryRecord->total_cost,
                     'created_by' => $actualInventoryRecord->created_by,
+                    'created_at' => $actualInventoryRecord->created_at,
                     'updated_by' => $id
                 ]);
             }

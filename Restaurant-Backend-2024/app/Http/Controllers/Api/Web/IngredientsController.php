@@ -34,7 +34,7 @@ class IngredientsController extends Controller
             $restaurant = UserManager::where('user_id', $user['id'])->first();
             $resto_id = $restaurant['restaurant_id'];
         }
-      
+
         $results = DB::select("
             WITH OrderIngredients AS (
                 SELECT restaurant_id, name, unit, COALESCE(SUM( quantity_json_object * quantity_json_object_q), 0) as used_quantity
@@ -48,7 +48,7 @@ class IngredientsController extends Controller
                             JSON_UNQUOTE(JSON_EXTRACT(orders.menu, CONCAT('$[', numbers.n, '].quantity'))),
                             JSON_UNQUOTE(JSON_EXTRACT(orders.menu, '$[0].quantity'))
                         ) AS quantity_json_object_q
-                    FROM menus 
+                    FROM menus
                     JOIN (
                         SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
                         -- Add more UNION ALL SELECT statements based on the maximum number of ingredients in a row
@@ -69,10 +69,10 @@ class IngredientsController extends Controller
             LEFT JOIN OrderIngredients oi ON ai.restaurant_id = oi.restaurant_id AND ai.name = oi.name
             WHERE ai.restaurant_id = $resto_id
             GROUP BY ai.name, ai.unit, ai.restaurant_id, used_quantity
-      
+
     ");
-    
- 
+
+
         if ($results){
             return response([
                 'data' => $results
@@ -82,14 +82,14 @@ class IngredientsController extends Controller
                 'message' => 'No data available'
             ], 422);
         }
- 
+
     }
     /**
      * Display a listing of the resource.
      */
     public function summary($id, $startDate, $endDate)
     {
-        
+
 
         if ($startDate === 'null' && $endDate === 'null'  ) {
             $currentDateTime = Carbon::now()->format('Y-m-d');
@@ -100,7 +100,7 @@ class IngredientsController extends Controller
             $end = $endDate;
         }
 
-        
+
 
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
@@ -114,11 +114,11 @@ class IngredientsController extends Controller
             $restaurant = UserManager::where('user_id', $user['id'])->first();
             $resto_id = $restaurant['restaurant_id'];
         }
-        
+
         // $sql = DB::table('ingredients')
         //     ->whereBetween('created_at', [$start, date('Y-m-d', strtotime($end . ' + 1 day'))])
         //     ->where('restaurant_id', $resto_id)
-        //     ->select(DB::raw('GROUP_CONCAT(DISTINCT 
+        //     ->select(DB::raw('GROUP_CONCAT(DISTINCT
         //         "MAX(CASE WHEN DATE(created_at) = \'", DATE(created_at), "\' THEN created_at END) AS ", DATE_FORMAT(created_at, "%M_%d")
         //     ) AS dynamic_columns'))
         //     ->get()
@@ -127,7 +127,7 @@ class IngredientsController extends Controller
 
         $sql = DB::table('ingredients')
     ->whereBetween('created_at', [$start, date('Y-m-d', strtotime($end . ' + 1 day'))])
-    ->select(DB::raw('GROUP_CONCAT(DISTINCT 
+    ->select(DB::raw('GROUP_CONCAT(DISTINCT
         "MAX(CASE WHEN DATE(created_at) = \'", DATE(created_at), "\' THEN CONCAT(quantity, \'/\', unit_cost) END) AS ", DATE_FORMAT(created_at, "%M_%d")
     ) AS dynamic_columns'))
     ->where('restaurant_id', $resto_id)
@@ -135,8 +135,8 @@ class IngredientsController extends Controller
     ->pluck('dynamic_columns')
     ->first();
 
- 
-        
+
+
         if ($sql) {
             // $query = DB::table('ingredients')
             // ->select([
@@ -153,7 +153,7 @@ class IngredientsController extends Controller
             // ->where('restaurant_id', $resto_id)
             // ->groupBy('name')
             // ->orderBy('name');
-        
+
             // $results = $query->get();
             $query = DB::table('ingredients')
     ->select([
@@ -189,7 +189,7 @@ $results = $query->get();
     public function store(StoreIngredientsRequest $request)
     {
         $data = $request->validated();
-        
+
         $user = User::where('id', $request->created_by)->first();
         $role_id = $user['role_id'];
 
@@ -204,7 +204,7 @@ $results = $query->get();
             $resto_id = $restaurant['restaurant_id'];
             $data['restaurant_id'] = $resto_id;
         }
-        
+
         $data['created_by'] = $request->created_by;
         Ingredient::create($data);
         $data['total_cost'] = ($request->quantity * $request->unit_cost);
@@ -215,19 +215,19 @@ $results = $query->get();
         if (!$actual) {
             ActualInventory::create($data);
         } else {
-            $quantity = $data['quantity'] + $actual->quantity; 
+            $quantity = $data['quantity'] + $actual->quantity;
             $user = ActualInventory::find($actual->id);
             $user->quantity = $quantity;
-            $user->save(); 
+            $user->save();
         }
 
         if (!$system) {
             SystemInventory::create($data);
         } else {
-            $quantity = $data['quantity'] + $system->quantity; 
+            $quantity = $data['quantity'] + $system->quantity;
             $user = SystemInventory::find($system->id);
             $user->quantity = $quantity;
-            $user->save(); 
+            $user->save();
         }
 
 
@@ -247,7 +247,7 @@ $results = $query->get();
         if ($role_id == 1) {
             return IngredientResource::collection(
                 Ingredient::orderBy('id','desc')->get()
-             ); 
+             );
         } else if ($role_id == 2) {
             return IngredientResource::collection(
                 Ingredient::join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
@@ -255,18 +255,18 @@ $results = $query->get();
                     ->where('restaurants.corporate_account', $id)
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
 
             return IngredientResource::collection(
-                Ingredient::join('restaurants', 'restaurants.id', 'Ingredients.restaurant_id')
+                Ingredient::join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
                     ->select('ingredients.*')
                     ->where('restaurants.id', $resto_id)
                     ->orderBy('id','desc')
                     ->get()
-             ); 
+             );
         }
     }
 
@@ -275,7 +275,7 @@ $results = $query->get();
      */
     public function edit(Ingredient $ingredient)
     {
-        
+
     }
 
     /**
@@ -292,7 +292,7 @@ $results = $query->get();
         $user->quantity = $request->quantity;
         $user->cost = $request->cost;
         $user->updated_by = $request->created_by;
-        $user->save(); 
+        $user->save();
 
         return response([
             'Success' => 'User successfully updated'
