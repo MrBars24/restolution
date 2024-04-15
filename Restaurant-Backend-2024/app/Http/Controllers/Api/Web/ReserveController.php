@@ -53,6 +53,12 @@ class ReserveController extends Controller
 
             $data['created_by'] = $request->created_by;
             $data['restaurant_id'] = $resto_id;
+        } else if ($role == 5) {
+            $restaurant = UserManager::where('user_id', $user['id'])->first();
+            $resto_id = $restaurant['restaurant_id'];
+
+            $data['created_by'] = $request->created_by;
+            $data['restaurant_id'] = $resto_id;
         } else if ($role == 1) {
             $manager = UserManager::where('user_id', $request->created_by)->first();
 

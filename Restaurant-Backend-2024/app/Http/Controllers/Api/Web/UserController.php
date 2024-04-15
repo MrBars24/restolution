@@ -245,6 +245,25 @@ class UserController extends Controller
         $user->status = $request->status;
         $user->save();
 
+        if ($request->role_id == 2) {
+            CorporateRestriction::where(['user_id' => $user->id])->update([
+                'allowed_restaurant' => $request->allowed_restaurant,
+                'allowed_bm' => $request->allowed_bm
+            ]);
+
+            // CorporateRestriction::create([
+            //     'user_id' => $user->id,
+            //     'allowed_restaurant' => $request->allowed_restaurant,
+            //     'allowed_bm' => $request->allowed_bm
+            // ]);
+            // UserPermission::create([
+            //     'user_id' => $user->id,
+            //     'permission' => json_encode($request->permission)
+            // ]);
+        }
+
+        UserManager::where('user_id', $request->id)
+                    ->update(['restaurant_id' => $request->restaurant_id]);
 
         $permissions = UserPermission::where('user_id', $request->id)->first();
 

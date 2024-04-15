@@ -13,11 +13,11 @@ import { useStateContext } from '../../../contexts/ContextProvider'
 function not(a, b) {
     return a.filter((value) => b.indexOf(value) === -1);
   }
-  
+
   function intersection(a, b) {
     return a.filter((value) => b.indexOf(value) !== -1);
   }
-  
+
   function union(a, b) {
     return [...a, ...not(b, a)];
   }
@@ -28,7 +28,7 @@ export default function User(props) {
     const id = props.Data?.id ?? null
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState(null)
-    const [restaurant, setRestaurant] = useState([]); 
+    const [restaurant, setRestaurant] = useState([]);
     const [user, setUser] = useState({
         id: "",
         first_name: "",
@@ -52,7 +52,7 @@ export default function User(props) {
         ev.preventDefault()
         setIsSubmitting(true);
         const payload = {...user}
-        
+
         try {
             const response = id
             ? await axiosClient.put(`/web/users/${id}`, payload)
@@ -74,7 +74,7 @@ export default function User(props) {
             }
         }
       }
-    
+
     const handleStatus= (event, newValue) => {
         setUser({
             ...user,
@@ -93,7 +93,7 @@ export default function User(props) {
 
     const handleRole= (event, newValue) => {
         // console.log(newValue)
-        let updatedUser = { ...user }; 
+        let updatedUser = { ...user };
         if (role == 1) {
             switch (newValue.role) {
                 case "Super Admin":
@@ -130,10 +130,10 @@ export default function User(props) {
           const { data } = await axiosClient.get(`/web/restaurant/${user_ID}`)
           setRestaurant(data.data)
         } catch (error) {
-    
+
         }
     }
-    
+
     const optionsRole = Role.RECORDS.filter((option) => {
         if (role == 1) {
             // Condition 1: Show all role_id for role 1
@@ -143,8 +143,8 @@ export default function User(props) {
             return option.role_id !== "1" && option.role_id !== "2";
         } else {
             // Condition 3: Show role_id 4 and 5 for role 3
-            return option.role_id === "4" || option.role_id === "5";
-        } 
+            return option.role_id === "4" || option.role_id === "5" || option.role_id === "6";
+        }
         }).map((filteredOption) => {
         // Transform the filtered options
         const firstLetter = filteredOption.role[0].toUpperCase();
@@ -156,8 +156,8 @@ export default function User(props) {
 
     const options = {
         addRowPosition: "first",
-        paging: false, 
-        emptyRowsWhenPaging: false, 
+        paging: false,
+        emptyRowsWhenPaging: false,
         actionsColumnIndex: -1,
         search: false,
         rowStyle: {
@@ -172,22 +172,22 @@ export default function User(props) {
           fontSize: 16,
         },
       };
- 
+
     useEffect(() => {
-        if (id) { 
-            
+        if (id) {
+
           const { id, first_name, last_name, email, status, role_id, restaurant_id, restaurant_name, permission, allowed_restaurant, allowed_bm } = props.Data;
           let role = '';
-      
+
           switch (role_id) {
               case 1:
               role = 'Super Admin';
               break;
               case 2:
-              role = 'Kitchen';
+              role = 'Corporate Manager';
               break;
               case 3:
-              role = 'Cashier';
+              role = 'Branch Manager';
               break;
               case 4:
               role = 'Kitchen';
@@ -218,7 +218,7 @@ export default function User(props) {
               allowed_restaurant,
               allowed_bm,
           });
-        } 
+        }
     }, [id, props.Data, props.show]);
 
       useEffect(() => {
@@ -236,10 +236,10 @@ export default function User(props) {
           setErrors(null)
           setLeft(Permission.RECORDS.map((item) => item.permission));
           setRight([]);
-          setChecked([]); 
+          setChecked([]);
         //   setHide(false)
         //   setadminHide(false)
-        } 
+        }
       },[props.show])
 
   const [checked, setChecked] = React.useState([]);
@@ -292,7 +292,7 @@ export default function User(props) {
         ...user,
         permission: not(right, rightChecked)
     })
-  
+
   };
 
   const customList = (title, items) => (
@@ -362,7 +362,7 @@ export default function User(props) {
             <Modal.Title>User</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
-                {errors && 
+                {errors &&
                 <div className="sevices_logo_errors">
                     {Object.keys(errors).map(key => (
                     <p key={key}>{errors[key][0]}</p>
@@ -375,22 +375,22 @@ export default function User(props) {
                         <Col xs={12} md={6}>
                             <TextField
                                 required
-                                type="text" 
-                                value={user.first_name} 
-                                onChange={ev => setUser({...user, first_name: ev.target.value})} 
-                                label="First Name" 
-                                variant="outlined" 
+                                type="text"
+                                value={user.first_name}
+                                onChange={ev => setUser({...user, first_name: ev.target.value})}
+                                label="First Name"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
                         <Col xs={12} md={6}>
-                            <TextField 
+                            <TextField
                                 required
-                                type="text" 
-                                value={user.last_name} 
-                                onChange={ev => setUser({...user, last_name: ev.target.value})} 
-                                label="Last Name" 
-                                variant="outlined" 
+                                type="text"
+                                value={user.last_name}
+                                onChange={ev => setUser({...user, last_name: ev.target.value})}
+                                label="Last Name"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
@@ -399,13 +399,13 @@ export default function User(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row>
                         <Col xs={12} md={6}>
-                            <TextField 
+                            <TextField
                                 required
-                                type="email" 
-                                value={user.email} 
-                                onChange={ev => setUser({...user, email: ev.target.value})} 
-                                label="Email" 
-                                variant="outlined" 
+                                type="email"
+                                value={user.email}
+                                onChange={ev => setUser({...user, email: ev.target.value})}
+                                label="Email"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
@@ -429,7 +429,7 @@ export default function User(props) {
                                     />
                                 )}
                             />
-                        </Col>  
+                        </Col>
                     </Row>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
@@ -462,7 +462,7 @@ export default function User(props) {
                                 onChange={handleChangeRestaurant}
                                 options={restaurant}
                                 value={user.restaurant_name}
-                                getOptionLabel={(options) => options.name ? options.name.toString() : user.restaurant_name}  
+                                getOptionLabel={(options) => options.name ? options.name.toString() : user.restaurant_name}
                                 isOptionEqualToValue={(option, value) => option.name ?? ""  === user.restaurant_name  }
                                 renderInput={(params) => (
                                     <TextField
@@ -494,7 +494,7 @@ export default function User(props) {
                             fullWidth
                             />
                         </Col>
-                        <Col xs={12} md={6}> 
+                        <Col xs={12} md={6}>
                         <TextField
                             required
                             type="number"
@@ -545,18 +545,18 @@ export default function User(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row >
                         <Col xs={12} md={6}>
-                            <Button 
-                            variant="contained" 
-                            // disabled={isSubmitting} 
-                            size="large" 
-                            color="success" 
-                            type="submit" 
+                            <Button
+                            variant="contained"
+                            // disabled={isSubmitting}
+                            size="large"
+                            color="success"
+                            type="submit"
                             >
                                 Save
                             </Button>
                         </Col>
                     </Row>
-                </Form.Group> 
+                </Form.Group>
                 </Form>
             </Modal.Body>
         </Modal>
