@@ -28,4 +28,9 @@ class Order extends Model
         'discount_id',
         'special_discount_id',
     ];
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
+    }
 }

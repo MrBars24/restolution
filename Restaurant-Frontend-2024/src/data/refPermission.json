@@ -131,6 +131,10 @@
         {
             "role_id": "34",
             "permission": "Inventory Remaining (Viewing)"
+        },
+        {
+            "role_id": "35",
+            "permission": "Reports"
         }
     ]
 }

@@ -22,7 +22,9 @@ class OrderResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'customer_name' => $this->customer_name,
             'restaurant_id' => $this->restaurant_id,
+            'restaurant' => $this->restaurant,
             'table_number' => $this->table_number,
             'menu_array' => $menusString,
             'menu' => $menuArray,
@@ -31,6 +33,7 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'total_amount' => $this->total_amount,
             'discount_amount' => $this->discount_amount,
+            'special_discount_amount' => $this->special_discount_amount,
             'vatable' => $this->vatable,
             'vat' => $this->vat,
             'cooked_by' => $this->cooked_by,

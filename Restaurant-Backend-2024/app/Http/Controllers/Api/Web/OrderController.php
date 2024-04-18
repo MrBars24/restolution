@@ -15,6 +15,7 @@ use App\Models\UsePromo;
 use App\Models\User;
 use App\Models\UserManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -344,22 +345,80 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
+        $filters = $request->filters;
+        $orderBy = Arr::get($request, "order_by", "id");
+        $orderDirection = Arr::get($request, "order_direction", "desc");
+        $page = Arr::get($request, "page", "");
+        $perPage = Arr::get($request, "per_page", "");
 
         if ($role_id == 1) {
-            return OrderResource::collection(
-                Order::orderBy('id','desc')->get()
-             );
+            $query = Order::with(['restaurant']);
+
+            if ($request->has("filters")) {
+                foreach ($filters as $key => $value) {
+                    if ($value["column"] === "restaurant.name") {
+                        $query->whereHas('restaurant', function ($q) use ($value) {
+                            $q->where('name', 'LIKE', "%{$value["value"]}%");
+                        });
+                    } else {
+                        $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
+                    }
+                }
+            }
+
+            // dd($query->toSql());
+            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
         } else if ($role_id == 2) {
-            return OrderResource::collection(
-                Order::join('restaurants', 'restaurants.id', 'categories.restaurant_id')
-                        ->select('categories.*')
-                        ->where('restaurants.corporate_account', $id)
-                        ->orderBy('id','desc')->get()
-             );
+            // return OrderResource::collection(
+            //     Order::join('restaurants', 'restaurants.id', 'categories.restaurant_id')
+            //             ->select('categories.*')
+            //             ->where('restaurants.corporate_account', $id)
+            //             ->orderBy('id','desc')->get()
+            //  );
+            $restaurant = Restaurant::where('corporate_account', $user['id'])->first();
+
+            $query = Order::with(['restaurant'])
+                    ->where('restaurant_id', $restaurant->id);
+
+            if ($request->has("filters")) {
+                foreach ($filters as $key => $value) {
+                    if ($value["column"] === "restaurant.name") {
+                        $query->whereHas('restaurant', function ($q) use ($value) {
+                            $q->where('name', 'LIKE', "%{$value["value"]}%");
+                        });
+                    } else {
+                        $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
+                    }
+                }
+            }
+
+            // dd($query->toSql());
+            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+        } else if ($role_id > 2) {
+            $restaurant = UserManager::where('user_id', $user['id'])->first();
+            $restaurant_id = $restaurant['restaurant_id'];
+
+            $query = Order::with(['restaurant'])
+                    ->where('restaurant_id', $restaurant_id);
+
+            if ($request->has("filters")) {
+                foreach ($filters as $key => $value) {
+                    if ($value["column"] === "restaurant.name") {
+                        $query->whereHas('restaurant', function ($q) use ($value) {
+                            $q->where('name', 'LIKE', "%{$value["value"]}%");
+                        });
+                    } else {
+                        $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
+                    }
+                }
+            }
+
+            // dd($query->toSql());
+            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
         }
     }
 
