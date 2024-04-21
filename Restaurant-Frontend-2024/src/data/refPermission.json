@@ -134,7 +134,31 @@
         },
         {
             "role_id": "35",
-            "permission": "Reports"
+            "permission": "Reports (Sales)"
+        },
+        {
+            "role_id": "36",
+            "permission": "Reports (Ingredients)"
+        },
+        {
+            "role_id": "37",
+            "permission": "Reports (Menu)"
+        },
+        {
+            "role_id": "38",
+            "permission": "Reports (Inventory)"
+        },
+        {
+            "role_id": "39",
+            "permission": "Reports (Discount)"
+        },
+        {
+            "role_id": "40",
+            "permission": "Reports (Reservations)"
+        },
+        {
+            "role_id": "41",
+            "permission": "Reports (User)"
         }
     ]
 }

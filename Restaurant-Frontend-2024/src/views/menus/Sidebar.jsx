@@ -38,6 +38,7 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const [selectedItem, setSelectedItem] = useState(null);
     const [isInventorySubMenuOpen, setInventorySubMenuOpen] = useState(false);
+    const [isReportsSubMenuOpen, setIsReportsSubMenuOpen] = useState(false);
     const pathParts = window.location.pathname.split('/');
     const path = pathParts[pathParts.length - 1];
     const [filteredSidebarItems, setFilteredSidebarItems] = useState([]);
@@ -47,9 +48,18 @@ export default function Sidebar() {
         navigate('/' + text);
     };
 
+    const handleListItemNavigate = (item) => {
+        setSelectedItem(item.text);
+        navigate(item.route);
+    }
+
     const toggleInventorySubMenu = () => {
         setInventorySubMenuOpen(!isInventorySubMenuOpen);
     };
+
+    const toggleReportsSubMenu = () => {
+        setIsReportsSubMenuOpen(!isReportsSubMenuOpen);
+    }
 
     const subMenuItems = [
         // { text: 'System', icon: <FiberManualRecordIcon fontSize='small' /> },
@@ -57,9 +67,14 @@ export default function Sidebar() {
         // { text: 'Remaining', icon: <FiberManualRecordIcon fontSize='small' /> },
     ];
 
+    const reportSubMenuItems = [];
+
     if (permission.includes("Inventory System (Viewing)")) subMenuItems.push({ text: 'System', icon: <FiberManualRecordIcon fontSize='small' /> });
     if (permission.includes("Inventory Actual (Viewing)")) subMenuItems.push({ text: 'Actual', icon: <FiberManualRecordIcon fontSize='small' /> });
     if (permission.includes("Inventory Remaining (Viewing)")) subMenuItems.push({ text: 'Remaining', icon: <FiberManualRecordIcon fontSize='small' /> });
+
+    if (permission.includes("Reports (Sales)")) reportSubMenuItems.push({ text: 'Sales', icon: <FiberManualRecordIcon fontSize='small' />, route: "/sales-report" });
+    if (permission.includes("Reports (Ingredients)")) reportSubMenuItems.push({ text: 'Ingredients', icon: <FiberManualRecordIcon fontSize='small' />, route: "/ingredients-report" });
 
     useEffect(() => {
         if (!selectedItem && path) {
@@ -113,6 +128,8 @@ export default function Sidebar() {
                             onClick={() => {
                                 if (text === 'Inventory') {
                                     toggleInventorySubMenu();
+                                } else if (text === 'Reports') {
+                                    toggleReportsSubMenu();
                                 } else {
                                     handleListItemClick(text);
                                 }
@@ -141,6 +158,15 @@ export default function Sidebar() {
                                     sx={{ padding: 0, minWidth: 'auto', pl: 2 }}
                                 >
                                     {isInventorySubMenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
+                            )}
+
+                            {text === 'Reports' && (
+                                <IconButton
+                                    onClick={toggleReportsSubMenu}
+                                    sx={{ padding: 0, minWidth: 'auto', pl: 2 }}
+                                >
+                                    {isReportsSubMenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                 </IconButton>
                             )}
                         </ListItemButton>
@@ -179,6 +205,45 @@ export default function Sidebar() {
                                             {subMenuItem.icon}
                                         </ListItemIcon>
                                         <ListItemText primary={subMenuItem.text} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Collapse>
+                    )}
+
+                    {text === 'Reports' && (
+                        <Collapse in={isReportsSubMenuOpen}>
+                            <List component="div" disablePadding>
+                                {reportSubMenuItems.map((reportSubMenuItem, subItemIndex) => (
+                                    <ListItem
+                                        key={reportSubMenuItem.text}
+                                        button
+                                        sx={{
+                                            pl: 5,
+                                            borderRadius: '25px',
+                                            backgroundColor: selectedItem === reportSubMenuItem.text ? '#1976d2' : 'inherit',
+                                            color: selectedItem === reportSubMenuItem.text ? '#fff' : 'inherit',
+                                            '&:hover': {
+                                                backgroundColor: '#1976d2',
+                                                color: '#fff',
+                                            },
+                                        }}
+                                        onClick={() => {
+                                            handleListItemNavigate(reportSubMenuItem);
+                                        }}
+                                    >
+                                        <ListItemIcon
+                                            sx={{
+                                                minWidth: 30,
+                                                color: selectedItem === reportSubMenuItem.text ? '#fff' : 'inherit',
+                                                '&:hover': {
+                                                    color: '#fff',
+                                                },
+                                            }}
+                                        >
+                                            {reportSubMenuItem.icon}
+                                        </ListItemIcon>
+                                        <ListItemText primary={reportSubMenuItem.text} />
                                     </ListItem>
                                 ))}
                             </List>

@@ -18,6 +18,7 @@ import Cashier from "./views/cashier/Cashier"
 import Report from "./views/reports/Report"
 import Reservation from "./views/pages/Reservation"
 import Remaining from "./views/pages/Inventory/Remaining"
+import ReportIngredients from "./views/reports/ReportIngredients"
 
 const router = createBrowserRouter([
     {
@@ -77,10 +78,14 @@ const router = createBrowserRouter([
                 element: <User />,
             },
             {
-                path: '/Reports',
+                path: '/sales-report',
                 element: <Report />,
+            },
+            {
+                path: '/ingredients-report',
+                element: <ReportIngredients />,
             }
-            
+
         ]
     },
     {
@@ -90,15 +95,15 @@ const router = createBrowserRouter([
             {
                 path: '/Login',
                 element: <FormLogin />
-            }   
+            }
         ]
     },
     {
         path: '*',
         element: <NotFound />
     }
-     
-    
-]) 
+
+
+])
 
 export default router

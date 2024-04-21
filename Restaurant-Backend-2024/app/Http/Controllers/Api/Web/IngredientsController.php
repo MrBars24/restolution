@@ -13,6 +13,7 @@ use App\Models\SystemInventory;
 use App\Models\User;
 use App\Models\UserManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Event\Telemetry\System;
@@ -239,35 +240,48 @@ $results = $query->get();
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
+        $filters = $request->filters;
+        $orderBy = Arr::get($request, "order_by", "id");
+        $orderDirection = Arr::get($request, "order_direction", "desc");
+        $perPage = Arr::get($request, "per_page", "");
+
+        $query = Ingredient::query();
+
+        if ($request->has("filters")) {
+            foreach ($filters as $key => $value) {
+                if ($value["column"] === "restaurant.name") {
+                    $query->whereHas('restaurant', function ($q) use ($value) {
+                        $q->where('name', 'LIKE', "%{$value["value"]}%");
+                    });
+                } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
+                    [$start, $end] = explode("_", $value["value"]);
+                    $query->whereBetween("created_at", [$start, $end]);
+                } else {
+                    $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
+                }
+            }
+        }
 
         if ($role_id == 1) {
-            return IngredientResource::collection(
-                Ingredient::orderBy('id','desc')->get()
-             );
+             return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
         } else if ($role_id == 2) {
-            return IngredientResource::collection(
-                Ingredient::join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
+            $query->join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
                     ->select('ingredients.*')
-                    ->where('restaurants.corporate_account', $id)
-                    ->orderBy('id','desc')
-                    ->get()
-             );
+                    ->where('restaurants.corporate_account', $id);
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
 
-            return IngredientResource::collection(
-                Ingredient::join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
-                    ->select('ingredients.*')
-                    ->where('restaurants.id', $resto_id)
-                    ->orderBy('id','desc')
-                    ->get()
-             );
+            $query->join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
+                ->select('ingredients.*')
+                ->where('restaurants.id', $resto_id);
         }
+
+        return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
     }
 
     /**
