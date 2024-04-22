@@ -130,6 +130,11 @@ export default function Input({ fromReport = false }) {
   useEffect(() => {
     // getCategory()
     getRestaurant();
+
+    if (!fromReport) {
+      getCategory();
+    }
+
     if (location.state == 'success'){
       setShowModal(false)
       setIngredientsInfo([])
@@ -248,7 +253,7 @@ export default function Input({ fromReport = false }) {
 
           )
         }}
-        data={query =>
+        data={fromReport ? query =>
           new Promise((resolve, reject) => {
 
           let filters = [];
@@ -295,7 +300,7 @@ export default function Input({ fromReport = false }) {
                 })
               }
             });
-        })}
+        }) : ingredients.data}
         actions={fromReport ? [] : actions}
         options={options}
       />

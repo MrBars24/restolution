@@ -11,6 +11,8 @@ use App\Models\Category;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\UserManager;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class MenuController extends Controller
 {
@@ -36,7 +38,7 @@ class MenuController extends Controller
                 ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id')
                 ->where('menus.restaurant_id', $id)
                 ->orderBy('menus.id','desc')->get()
-         ); 
+         );
     }
 
     /**
@@ -82,39 +84,55 @@ class MenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
+        $filters = $request->filters;
+        $orderBy = Arr::get($request, "order_by", "id");
+        $orderDirection = Arr::get($request, "order_direction", "desc");
+        $perPage = Arr::get($request, "per_page", 0);
+
+        $query = Menu::query();
+
+        if ($request->has("filters")) {
+            foreach ($filters as $key => $value) {
+                if ($value["column"] === "restaurant.name") {
+                    $query->whereHas('restaurant', function ($q) use ($value) {
+                        $q->where('name', 'LIKE', "%{$value["value"]}%");
+                    });
+                } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
+                    [$start, $end] = explode("_", $value["value"]);
+                    $query->whereBetween("menus.created_at", [$start, $end]);
+                } else {
+                    $col = $value["column"];
+
+                    if ($col == "restaurant_id") $col = "menus.restaurant_id";
+
+                    $query->where($col, 'LIKE', "%{$value["value"]}%");
+                }
+            }
+        }
 
         if ($role_id == 1) {
-            return MenuResource::collection(
-                Menu::join('menu_tabs', 'menu_tabs.id', '=', 'menus.menutab_id')
-                    ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id')
-                    ->orderBy('menus.id','desc')->get()
-             ); 
+            $query->join('menu_tabs', 'menu_tabs.id', '=', 'menus.menutab_id')
+                    ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id');
         } else if ($role_id == 2) {
-            return MenuResource::collection(
-                Menu::join('menu_tabs', 'menu_tabs.id', '=', 'menus.menutab_id')
-                    ->join('restaurants', 'restaurants.id', 'menus.restaurant_id')
-                    ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id')
-                    ->where('restaurants.corporate_account', $id)
-                    ->orderBy('menus.id','desc')
-                    ->get()
-             ); 
+            $query->join('menu_tabs', 'menu_tabs.id', '=', 'menus.menutab_id')
+                ->join('restaurants', 'restaurants.id', 'menus.restaurant_id')
+                ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id')
+                ->where('restaurants.corporate_account', $id);
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
 
-            return MenuResource::collection(
-                Menu::join('menu_tabs', 'menu_tabs.id', '=', 'menus.menutab_id')
-                    ->join('restaurants', 'restaurants.id', 'menus.restaurant_id')
-                    ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id')
-                    ->where('restaurants.id', $resto_id)
-                    ->orderBy('menus.id','desc')
-                    ->get()
-             ); 
+            $query->join('menu_tabs', 'menu_tabs.id', '=', 'menus.menutab_id')
+                ->join('restaurants', 'restaurants.id', 'menus.restaurant_id')
+                ->select('menus.*', 'menu_tabs.name as menutab', 'menu_tabs.id as menutab_id')
+                ->where('restaurants.id', $resto_id);
         }
+
+        return MenuResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
     }
 
     /**
@@ -143,7 +161,7 @@ class MenuController extends Controller
         $menu->category = $request->category;
         $menu->image = $request->image;
         $menu->updated_by = $request->created_by;
-        $menu->save(); 
+        $menu->save();
 
         return response([
             'Success' => 'User successfully updated'

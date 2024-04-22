@@ -247,7 +247,7 @@ $results = $query->get();
         $filters = $request->filters;
         $orderBy = Arr::get($request, "order_by", "id");
         $orderDirection = Arr::get($request, "order_direction", "desc");
-        $perPage = Arr::get($request, "per_page", "");
+        $perPage = Arr::get($request, "per_page", 0);
 
         $query = Ingredient::query();
 
@@ -259,8 +259,11 @@ $results = $query->get();
                     });
                 } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
                     [$start, $end] = explode("_", $value["value"]);
-                    $query->whereBetween("created_at", [$start, $end]);
+                    $query->whereBetween("ingredients.created_at", [$start, $end]);
                 } else {
+                    $col = $value["column"];
+                    if ($col == "restaurant_id") $col = "menus.restaurant_id";
+
                     $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
                 }
             }

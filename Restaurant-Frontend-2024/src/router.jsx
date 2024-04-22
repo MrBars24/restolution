@@ -19,6 +19,7 @@ import Report from "./views/reports/Report"
 import Reservation from "./views/pages/Reservation"
 import Remaining from "./views/pages/Inventory/Remaining"
 import ReportIngredients from "./views/reports/ReportIngredients"
+import ReportMenu from "./views/reports/ReportMenu"
 
 const router = createBrowserRouter([
     {
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
             {
                 path: '/ingredients-report',
                 element: <ReportIngredients />,
+            },
+            {
+                path: '/menu-report',
+                element: <ReportMenu />,
             }
 
         ]
