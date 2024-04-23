@@ -292,6 +292,7 @@ export default function Input({ fromReport = false }) {
               if ("data" in response && Array.isArray(response.data.data)) {
                 // console.log(response.data);
                 // setData(response.data.data);
+                setLoading(false);
                 resolve({
                       data: response.data.data,
                       page: response.data.meta.current_page - 1,
@@ -303,6 +304,7 @@ export default function Input({ fromReport = false }) {
         }) : ingredients.data}
         actions={fromReport ? [] : actions}
         options={options}
+        isLoading={loading}
       />
       </div>
       {!fromReport && <Ingredients show={showModal} Data={ingredientsInfo} close={handleModalClose} />}

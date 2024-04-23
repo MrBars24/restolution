@@ -12,6 +12,7 @@ use App\Models\UsePromo;
 use App\Models\User;
 use App\Models\UserManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -53,13 +54,13 @@ class PromoController extends Controller
             ];
 
             $voucher = UsePromo::create($data);
-            
+
             $promo['menu'] = json_decode($promo->menu);
-    
+
             return response([
                 'discount_id' => $voucher->id,
                 'data' => $promo
-                
+
             ], 200);
 
         } else {
@@ -117,50 +118,65 @@ class PromoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
+        $filters = $request->filters;
+        $orderBy = Arr::get($request, "order_by", "id");
+        $orderDirection = Arr::get($request, "order_direction", "desc");
+        $perPage = Arr::get($request, "per_page", 0);
+
+        $query = Promo::query();
+
+        if ($request->has("filters")) {
+            foreach ($filters as $key => $value) {
+                if ($value["column"] === "restaurant.name") {
+                    $query->whereHas('restaurant', function ($q) use ($value) {
+                        $q->where('name', 'LIKE', "%{$value["value"]}%");
+                    });
+                } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
+                    [$start, $end] = explode("_", $value["value"]);
+                    $query->whereBetween("promos.created_at", [$start, $end]);
+                } else {
+                    $col = $value["column"];
+
+                    if ($col == "restaurant_id") $col = "promos.restaurant_id";
+
+                    $query->where($col, 'LIKE', "%{$value["value"]}%");
+                }
+            }
+        }
 
         if ($role_id == 1) {
-            return PromoResource::collection(
-                // Service::orderBy('id','desc')->get()
-                Promo::join('users as created', 'created.id', 'promos.created_by')
-                        ->join('users as updated', 'updated.id', 'promos.created_by')
-                        ->join('restaurants', 'restaurants.id', 'promos.restaurant_id')
-                        ->join('users', 'users.id', 'restaurants.corporate_account')
-                        ->select('promos.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
-                        DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"), 'restaurants.name as restaurant_name', 'users.reference_number')
-                        ->get()
-             ); 
+            $query->join('users as created', 'created.id', 'promos.created_by')
+                ->join('users as updated', 'updated.id', 'promos.created_by')
+                ->join('restaurants', 'restaurants.id', 'promos.restaurant_id')
+                ->join('users', 'users.id', 'restaurants.corporate_account')
+                ->select('promos.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
+                DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"), 'restaurants.name as restaurant_name', 'users.reference_number');
         } else if ($role_id == 2) {
-            return PromoResource::collection(
-                // Service::orderBy('id','desc')->get()
-                Promo::join('users as created', 'created.id', 'promos.created_by')
-                        ->join('users as updated', 'updated.id', 'promos.created_by')
-                        ->join('restaurants', 'restaurants.id', 'promos.restaurant_id')
-                        ->join('users', 'users.id', 'restaurants.corporate_account')
-                        ->select('promos.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
-                        DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"), 'restaurants.name as restaurant_name', 'users.reference_number')
-                        ->where('restaurants.corporate_account', $id)
-                        ->get()
-             ); 
+            $query->join('users as created', 'created.id', 'promos.created_by')
+                ->join('users as updated', 'updated.id', 'promos.created_by')
+                ->join('restaurants', 'restaurants.id', 'promos.restaurant_id')
+                ->join('users', 'users.id', 'restaurants.corporate_account')
+                ->select('promos.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
+                DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"), 'restaurants.name as restaurant_name', 'users.reference_number')
+                ->where('restaurants.corporate_account', $id);
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
 
-            return PromoResource::collection(
-                // Service::orderBy('id','desc')->get()
-                Promo::join('users as created', 'created.id', 'promos.created_by')
-                        ->join('users as updated', 'updated.id', 'promos.created_by')
-                        ->join('restaurants', 'restaurants.id', 'promos.restaurant_id')
-                        ->join('users', 'users.id', 'restaurants.corporate_account')
-                        ->select('promos.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"), 
-                        DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"), 'restaurants.name as restaurant_name', 'users.reference_number')
-                        ->where('restaurants.id', $resto_id)
-                        ->get()
-             ); 
+            $query->join('users as created', 'created.id', 'promos.created_by')
+                    ->join('users as updated', 'updated.id', 'promos.created_by')
+                    ->join('restaurants', 'restaurants.id', 'promos.restaurant_id')
+                    ->join('users', 'users.id', 'restaurants.corporate_account')
+                    ->select('promos.*', DB::raw("CONCAT(created.first_name, ' ', created.last_name) as createdBy"),
+                    DB::raw("CONCAT(updated.first_name, ' ', updated.last_name) as updatedBy"), 'restaurants.name as restaurant_name', 'users.reference_number')
+                    ->where('restaurants.id', $resto_id);
         }
+
+        return PromoResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
     }
 
     /**

@@ -20,6 +20,7 @@ import Reservation from "./views/pages/Reservation"
 import Remaining from "./views/pages/Inventory/Remaining"
 import ReportIngredients from "./views/reports/ReportIngredients"
 import ReportMenu from "./views/reports/ReportMenu"
+import ReportPromo from "./views/reports/ReportPromo"
 
 const router = createBrowserRouter([
     {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
             {
                 path: '/menu-report',
                 element: <ReportMenu />,
+            },
+            {
+                path: '/promo-report',
+                element: <ReportPromo />,
             }
 
         ]

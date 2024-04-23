@@ -309,7 +309,8 @@ export default function Menu({ fromReport = false }) {
             .then(response => {
               if ("data" in response && Array.isArray(response.data.data)) {
                 // console.log(response.data);
-                // setData(response.data.data);
+                // setData(response.data.data)
+                setLoading(false);
                 resolve({
                   data: response.data.data,
                   page: response.data.meta.current_page - 1,
@@ -318,8 +319,9 @@ export default function Menu({ fromReport = false }) {
               }
             });
         }) : menu.data}
-        actions={actions}
+        actions={fromReport ? [] : actions}
         options={options}
+        isLoading={loading}
       />
       <MenuModal show={showModal} Data={menuInfo} close={handleModalClose}  />
       </div>

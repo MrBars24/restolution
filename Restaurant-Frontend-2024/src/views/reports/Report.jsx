@@ -234,6 +234,7 @@ export default function Report() {
                 // console.log(response.data);
                 // setData(response.data.data);
                 console.log(response.data.meta);
+                setLoading(false);
 
                 resolve({
                       data: response.data.data,
