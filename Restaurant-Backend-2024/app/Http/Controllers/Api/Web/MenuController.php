@@ -92,6 +92,7 @@ class MenuController extends Controller
         $orderBy = Arr::get($request, "order_by", "id");
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
+        $currentPage = Arr::get($request, "page", 0);
 
         $query = Menu::query();
 
@@ -132,7 +133,7 @@ class MenuController extends Controller
                 ->where('restaurants.id', $resto_id);
         }
 
-        return MenuResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+        return MenuResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
     }
 
     /**

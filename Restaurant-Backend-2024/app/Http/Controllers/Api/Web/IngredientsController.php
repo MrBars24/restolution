@@ -270,7 +270,7 @@ $results = $query->get();
         }
 
         if ($role_id == 1) {
-             return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+             return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
         } else if ($role_id == 2) {
             $query->join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
                     ->select('ingredients.*')
@@ -284,7 +284,7 @@ $results = $query->get();
                 ->where('restaurants.id', $resto_id);
         }
 
-        return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+        return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
     }
 
     /**

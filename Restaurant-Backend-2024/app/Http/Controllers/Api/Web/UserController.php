@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\UserManager;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -186,48 +187,68 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $user = User::where('id', $id)->first();
         $role_id = $user['role_id'];
+        $filters = $request->filters;
+        $orderBy = Arr::get($request, "order_by", "id");
+        $orderDirection = Arr::get($request, "order_direction", "desc");
+        $perPage = Arr::get($request, "per_page", 0);
+        $currentPage = Arr::get($request, "page", 0);
+
 
         // return $role_id;
 
+        $query = User::query();
+
+        if ($request->has("filters")) {
+            foreach ($filters as $key => $value) {
+                if ($value["column"] === "restaurant.name") {
+                    $query->whereHas('restaurant', function ($q) use ($value) {
+                        $q->where('name', 'LIKE', "%{$value["value"]}%");
+                    });
+                } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
+                    [$start, $end] = explode("_", $value["value"]);
+                    $query->whereBetween("users.created_at", [$start, $end]);
+                } else {
+                    $col = $value["column"];
+
+                    if ($col == "restaurant_id") $col = "restaurants.id";
+
+                    $query->where($col, 'LIKE', "%{$value["value"]}%");
+                }
+            }
+        }
+
+
         if ($role_id == 1) {
-            return UserResource::collection(
-                User::leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
-                    ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
-                    ->leftjoin('restaurants', 'restaurants.id', 'user_managers.restaurant_id')
-                    ->leftjoin('corporate_restrictions', 'corporate_restrictions.user_id', 'users.id')
-                    ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name', 'corporate_restrictions.allowed_restaurant', 'corporate_restrictions.allowed_bm')
-                    ->orderBy('id','desc')->get()
-             );
+            $query->leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
+                ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
+                ->leftjoin('restaurants', 'restaurants.id', 'user_managers.restaurant_id')
+                ->leftjoin('corporate_restrictions', 'corporate_restrictions.user_id', 'users.id')
+                ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name', 'corporate_restrictions.allowed_restaurant', 'corporate_restrictions.allowed_bm');
         } else if ($role_id == 2) {
             $restaurant = Restaurant::where('corporate_account', $id)->first();
             $resto_id = $restaurant['id'];
 
-
-            return UserResource::collection(
-                User::leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
-                    ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
-                    ->leftjoin('restaurants', 'restaurants.id', 'user_managers.restaurant_id')
-                    ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name')
-                    ->where('restaurants.id', $resto_id)
-                    ->orderBy('id','desc')->get()
-             );
+            $query->leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
+                ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
+                ->leftjoin('restaurants', 'restaurants.id', 'user_managers.restaurant_id')
+                ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name')
+                ->where('restaurants.id', $resto_id);
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
             $resto_id = $restaurant['restaurant_id'];
-            return UserResource::collection(
-                User::leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
-                    ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
-                    ->leftjoin('restaurants', 'restaurants.id', 'user_managers.restaurant_id')
-                    ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name')
-                    ->where('restaurants.id', $resto_id)
-                    ->orderBy('id','desc')->get()
-             );
+
+            $query->leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
+                ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
+                ->leftjoin('restaurants', 'restaurants.id', 'user_managers.restaurant_id')
+                ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name')
+                ->where('restaurants.id', $resto_id);
         }
 
+        return UserResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
     }
 
     /**

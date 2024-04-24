@@ -353,7 +353,8 @@ class OrderController extends Controller
         $orderBy = Arr::get($request, "order_by", "id");
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $page = Arr::get($request, "page", "");
-        $perPage = Arr::get($request, "per_page", "");
+        $perPage = Arr::get($request, "per_page", 0);
+        $currentPage = Arr::get($request, "page", 0);
 
         if ($role_id == 1) {
             $query = Order::with(['restaurant']);
@@ -374,7 +375,7 @@ class OrderController extends Controller
             }
 
             // dd($query->toSql());
-            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
         } else if ($role_id == 2) {
             // return OrderResource::collection(
             //     Order::join('restaurants', 'restaurants.id', 'categories.restaurant_id')
@@ -403,7 +404,7 @@ class OrderController extends Controller
             }
 
             // dd($query->toSql());
-            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
         } else if ($role_id > 2) {
             $restaurant = UserManager::where('user_id', $user['id'])->first();
             $restaurant_id = $restaurant['restaurant_id'];

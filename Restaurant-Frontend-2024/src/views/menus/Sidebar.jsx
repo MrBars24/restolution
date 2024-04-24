@@ -78,6 +78,8 @@ export default function Sidebar() {
     if (permission.includes("Reports (Menu)")) reportSubMenuItems.push({ text: 'Menu', icon: <FiberManualRecordIcon fontSize='small' />, route: "/menu-report" });
     if (permission.includes("Reports (Discount)")) reportSubMenuItems.push({ text: 'Promo', icon: <FiberManualRecordIcon fontSize='small' />, route: "/promo-report" });
     if (permission.includes("Reports (Reservations)")) reportSubMenuItems.push({ text: 'Reservation', icon: <FiberManualRecordIcon fontSize='small' />, route: "/reservation-report" });
+    if (permission.includes("Reports (Inventory)")) reportSubMenuItems.push({ text: 'Inventory', icon: <FiberManualRecordIcon fontSize='small' />, route: "/inventory-report" });
+    if (permission.includes("Reports (User)")) reportSubMenuItems.push({ text: 'User', icon: <FiberManualRecordIcon fontSize='small' />, route: "/user-report" });
 
     useEffect(() => {
         if (!selectedItem && path) {

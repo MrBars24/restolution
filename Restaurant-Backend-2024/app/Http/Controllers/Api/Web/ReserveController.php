@@ -85,6 +85,7 @@ class ReserveController extends Controller
         $orderBy = Arr::get($request, "order_by", "id");
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
+        $currentPage = Arr::get($request, "page", 0);
 
         $query = Reservation::query();
 
@@ -128,7 +129,7 @@ class ReserveController extends Controller
                 ->where('restaurants.corporate_account', $restaurant->corporate_account);
         }
 
-        return ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+        return ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
     }
 
     /**
