@@ -10,6 +10,7 @@ use App\Models\Reservation;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\UserManager;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +87,7 @@ class ReserveController extends Controller
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
+        $isPrint = Arr::get($request, "print", false);
 
         $query = Reservation::query();
 
@@ -129,7 +131,13 @@ class ReserveController extends Controller
                 ->where('restaurants.corporate_account', $restaurant->corporate_account);
         }
 
-        return ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        if ($isPrint) {
+            $data = ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+            $pdf = Pdf::loadView('reservation_report_pdf', ['data' => $data]);
+            return $pdf->stream('test.pdf');
+        } else {
+            return ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        }
     }
 
     /**

@@ -9,40 +9,40 @@
     <link rel="stylesheet" href="{{ asset('pdf.css') }}" type="text/css"/>
 </head>
 <body>
-    <h1>Discounts Report</h1>
+    <h1>Reservation Report</h1>
     <div class="margin-top">
         <table class="products">
             <tr>
-                <th>Voucher Code</th>
-                <th>Category</th>
-                <th>Date Range</th>
-                <th>Created By</th>
-                <th>Updated By</th>
+                <th>Guest Name</th>
+                <th>Table #</th>
+                <th># of Guest</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Notes</th>
                 <th>Date Created</th>
-                <th>Date Updated</th>
             </tr>
             @foreach($data as $item)
                 <tr class="items">
                     <td>
-                        {{ $item->voucher_code }}
+                        {{ $item->guest_name }}
                     </td>
                     <td>
-                        {{ $item->category}}
+                        {{ $item->table_number}}
                     </td>
                     <td>
-                        {{ $item->datefrom . " - " . $item->dateto }}
+                        {{ $item->number_of_guest }}
                     </td>
                     <td>
-                        {{ $item->createdBy}}
+                        {{ $item->date}}
                     </td>
                     <td>
-                        {{ $item->updatedBy }}
+                        {{ $item->time }}
+                    </td>
+                    <td>
+                        {{ $item->notes }}
                     </td>
                     <td>
                         {{ $item->created_at }}
-                    </td>
-                    <td>
-                        {{ $item->updated_at }}
                     </td>
                 </tr>
             @endforeach

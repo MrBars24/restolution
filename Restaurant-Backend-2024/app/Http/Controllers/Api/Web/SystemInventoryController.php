@@ -11,6 +11,7 @@ use App\Models\Restaurant;
 use App\Models\SystemInventory;
 use App\Models\User;
 use App\Models\UserManager;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -121,6 +122,7 @@ class SystemInventoryController extends Controller
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
+        $isPrint = Arr::get($request, "print", false);
 
         $query = SystemInventory::query();
 
@@ -168,7 +170,14 @@ class SystemInventoryController extends Controller
                 ->where('restaurants.id', $resto_id);
         }
 
-        return SystemInventoryResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        if ($isPrint) {
+            $data = SystemInventoryResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+            $pdf = Pdf::loadView('inventory_report_pdf', ['data' => $data]);
+            return $pdf->stream('test.pdf');
+        } else {
+            return SystemInventoryResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        }
+
     }
 
     /**
