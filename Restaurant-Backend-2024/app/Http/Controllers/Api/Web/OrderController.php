@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -355,6 +356,7 @@ class OrderController extends Controller
         $page = Arr::get($request, "page", "");
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
+        $isPrint = Arr::get($request, "print", false);
 
         if ($role_id == 1) {
             $query = Order::with(['restaurant']);
@@ -374,8 +376,15 @@ class OrderController extends Controller
                 }
             }
 
-            // dd($query->toSql());
-            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+            if ($isPrint) {
+                $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
+                return $pdf->stream('test.pdf');
+            } else {
+                // dd($query->toSql());
+                return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+            }
+
         } else if ($role_id == 2) {
             // return OrderResource::collection(
             //     Order::join('restaurants', 'restaurants.id', 'categories.restaurant_id')
@@ -404,7 +413,13 @@ class OrderController extends Controller
             }
 
             // dd($query->toSql());
-            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+            if ($isPrint) {
+                $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
+                return $pdf->stream('test.pdf');
+            } else {
+                return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+            }
         } else if ($role_id > 2) {
             $restaurant = UserManager::where('user_id', $user['id'])->first();
             $restaurant_id = $restaurant['restaurant_id'];
@@ -428,7 +443,14 @@ class OrderController extends Controller
             }
 
             // dd($query->toSql());
-            return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+
+            if ($isPrint) {
+                $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
+                return $pdf->stream('test.pdf');
+            } else {
+                return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));
+            }
         }
     }
 

@@ -211,7 +211,7 @@ export default function Promo(props) {
         setErrors(null)
         const payload = {...promo}
 
-        console.log(payload)
+        // console.log(payload)
 
         try {
             const response = id

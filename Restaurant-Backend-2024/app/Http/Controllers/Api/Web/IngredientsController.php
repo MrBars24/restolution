@@ -12,6 +12,7 @@ use App\Models\Restaurant;
 use App\Models\SystemInventory;
 use App\Models\User;
 use App\Models\UserManager;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -249,6 +250,7 @@ $results = $query->get();
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
+        $isPrint = Arr::get($request, "print", false);
 
         $query = Ingredient::query();
 
@@ -271,7 +273,16 @@ $results = $query->get();
         }
 
         if ($role_id == 1) {
-             return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+            if ($isPrint) {
+                $data = IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+                $pdf = Pdf::loadView('ingredients_report_pdf', ['data' => $data]);
+                return $pdf->stream('test.pdf');
+            } else {
+                // dd($query->toSql());
+                // return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+                return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+            }
+
         } else if ($role_id == 2) {
             $query->join('restaurants', 'restaurants.id', 'ingredients.restaurant_id')
                     ->select('ingredients.*')
@@ -285,7 +296,13 @@ $results = $query->get();
                 ->where('restaurants.id', $resto_id);
         }
 
-        return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        if ($isPrint) {
+            $data = IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+            $pdf = Pdf::loadView('ingredients_report_pdf', ['data' => $data]);
+            return $pdf->stream('test.pdf');
+        } else {
+            return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        }
     }
 
     /**

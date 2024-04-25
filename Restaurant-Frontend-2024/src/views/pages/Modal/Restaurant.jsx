@@ -20,9 +20,9 @@ export default function Restaurant(props) {
     const id = props.Data?.id ?? null
     const [isSubmitting, setIsSubmitting] = useState(false);
     const longi = localStorage.longi ?? ''
-    const lati = localStorage.lati ?? ''    
+    const lati = localStorage.lati ?? ''
     const [errors, setErrors] = useState(null)
-    const [corporate, setCorporate] = useState([]); 
+    const [corporate, setCorporate] = useState([]);
     const [municipality, setMunicipality] = useState([])
     const [brgy, setBrgy] = useState([])
     const [valCityMun, setValCityMun] = useState(null);
@@ -61,7 +61,7 @@ export default function Restaurant(props) {
       const handleChangeMunicipality = (event, newValue) => {
         setValCityMun(newValue);
         const filterBrgy = Barangay.RECORDS.filter((data) => data.citymunCode === newValue.citymunCode)
-        setBrgy(filterBrgy) 
+        setBrgy(filterBrgy)
         setValBrgy(null);
         setRestaurant({
           ...restaurant,
@@ -84,7 +84,7 @@ export default function Restaurant(props) {
         setErrors(null)
         setIsSubmitting(true);
         const payload = {...restaurant}
-        console.log(payload)
+        // console.log(payload)
         try {
             const response = id
             ? await axiosClient.put(`/web/restaurant/${id}`, payload)
@@ -188,7 +188,7 @@ export default function Restaurant(props) {
           const { data } = await axiosClient.get(`/web/corporate_account/${user_ID}`)
           setCorporate(data.data)
         } catch (error) {
-    
+
         }
       }
 
@@ -218,7 +218,7 @@ export default function Restaurant(props) {
           setErrors(null);
         } else if (role == 1) {
           getCorporate()
-        } 
+        }
       }, [id, props.show, role]);
 
       useEffect(() => {
@@ -240,7 +240,7 @@ export default function Restaurant(props) {
             <Modal.Title>Restaurant</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
-                {errors && 
+                {errors &&
                 <div className="sevices_logo_errors">
                     {Object.keys(errors).map(key => (
                     <p key={key}>{errors[key][0]}</p>
@@ -253,22 +253,22 @@ export default function Restaurant(props) {
                         <Col xs={12} md={6}>
                             <TextField
                                 required
-                                type="text" 
-                                value={restaurant.name} 
-                                onChange={ev => setRestaurant({...restaurant, name: ev.target.value})} 
-                                label="Name" 
-                                variant="outlined" 
+                                type="text"
+                                value={restaurant.name}
+                                onChange={ev => setRestaurant({...restaurant, name: ev.target.value})}
+                                label="Name"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
                         <Col xs={12} md={6}>
-                            <TextField 
+                            <TextField
                                 required
-                                type="text" 
-                                value={restaurant.table_number} 
-                                onChange={ev => setRestaurant({...restaurant, table_number: ev.target.value})} 
-                                label="Total number of table" 
-                                variant="outlined" 
+                                type="text"
+                                value={restaurant.table_number}
+                                onChange={ev => setRestaurant({...restaurant, table_number: ev.target.value})}
+                                label="Total number of table"
+                                variant="outlined"
                                 fullWidth
                             />
                         </Col>
@@ -277,24 +277,24 @@ export default function Restaurant(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                   <Row>
                     <Col xs={12} md={6}>
-                      <TextField 
+                      <TextField
                         required
-                        type="text" 
-                        value={restaurant.house_number} 
-                        onChange={ev => setRestaurant({...restaurant, house_number: ev.target.value})} 
-                        id="street" 
-                        label="House Number / Street" 
-                        variant="outlined" 
+                        type="text"
+                        value={restaurant.house_number}
+                        onChange={ev => setRestaurant({...restaurant, house_number: ev.target.value})}
+                        id="street"
+                        label="House Number / Street"
+                        variant="outlined"
                         fullWidth
                       />
                     </Col>
-                    <Col xs={12} md={6}> 
+                    <Col xs={12} md={6}>
                       <Autocomplete
                         disableClearable
                         onChange={handleChangeProvince}
                         options={optionsProvince.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                         value={restaurant.province ?? ""}
-                        getOptionLabel={(options) => options.provDesc ? options.provDesc.toString() : restaurant.province}  
+                        getOptionLabel={(options) => options.provDesc ? options.provDesc.toString() : restaurant.province}
                         isOptionEqualToValue={(option, value) => option.provDesc ?? ""  === restaurant.province  }
                         renderInput={(params) => (
                             <TextField
@@ -304,7 +304,7 @@ export default function Restaurant(props) {
                             InputProps={{
                                 ...params.InputProps,
                                 type: 'search',
-                            }} 
+                            }}
                             />
                         )}
                       />
@@ -319,7 +319,7 @@ export default function Restaurant(props) {
                         onChange={handleChangeMunicipality}
                         options={optionsCityMun.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                         value={restaurant.municipality ?? valCityMun  }
-                        getOptionLabel={(options) =>  options.citymunDesc ? options.citymunDesc.toString() : restaurant.municipality}  
+                        getOptionLabel={(options) =>  options.citymunDesc ? options.citymunDesc.toString() : restaurant.municipality}
                         isOptionEqualToValue={(option, value) => option.citymunDesc ?? "" === restaurant.municipality}
                         renderInput={(params) => (
                           <TextField
@@ -334,7 +334,7 @@ export default function Restaurant(props) {
                         )}
                       />
                     </Col>
-                    <Col xs={12} md={6}> 
+                    <Col xs={12} md={6}>
                       <Autocomplete
                         disableClearable
                         onChange={handleChangeBrgy}
@@ -360,35 +360,35 @@ export default function Restaurant(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                   <Row>
                     <Col xs={12} md={6}>
-                      <TextField 
+                      <TextField
                         // required
-                        type="text" 
-                        id="longitude" 
-                        label="Longitude" 
-                        value={restaurant.longitude} 
-                        variant="outlined" 
+                        type="text"
+                        id="longitude"
+                        label="Longitude"
+                        value={restaurant.longitude}
+                        variant="outlined"
                         fullWidth
                       />
                     </Col>
-                    <Col xs={12} md={5}> 
-                      <TextField 
+                    <Col xs={12} md={5}>
+                      <TextField
                         // required
-                        type="text" 
-                        id="latitude" 
-                        label="Latitude" 
-                        value={restaurant.latitude}  
-                        variant="outlined" 
+                        type="text"
+                        id="latitude"
+                        label="Latitude"
+                        value={restaurant.latitude}
+                        variant="outlined"
                         fullWidth
                       />
                     </Col>
-                    <Col xs={12} md={1} className="d-flex align-items-center"> 
+                    <Col xs={12} md={1} className="d-flex align-items-center">
                         <IconButton className="globe-icon" onClick={onclickMap}>
                           <PublicIcon />
                         </IconButton>
                     </Col>
                   </Row>
                 </Form.Group>
-                { role == 1 && 
+                { role == 1 &&
                   <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row>
                       <Col xs={12} md={6}>
@@ -397,7 +397,7 @@ export default function Restaurant(props) {
                           onChange={handleChangeCorporate}
                           options={corporate}
                           value={restaurant.corporate_name}
-                          getOptionLabel={(options) => options.first_name ? options.first_name.toString() : restaurant.corporate_name}  
+                          getOptionLabel={(options) => options.first_name ? options.first_name.toString() : restaurant.corporate_name}
                           isOptionEqualToValue={(option, value) => option.first_name ?? ""  === restaurant.corporate_name  }
                           renderInput={(params) => (
                             <TextField
@@ -417,18 +417,18 @@ export default function Restaurant(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row>
                         <Col xs={12} md={6}>
-                        <input 
-                            accept=".jpg, .jpeg, .png" 
-                            className="fileUpload" 
-                            name="arquivo" 
-                            id="arquivo" 
-                            type="file" 
-                            onChange={onImageChoose} 
+                        <input
+                            accept=".jpg, .jpeg, .png"
+                            className="fileUpload"
+                            name="arquivo"
+                            id="arquivo"
+                            type="file"
+                            onChange={onImageChoose}
                         />
-                        </Col>  
+                        </Col>
                         <Col xs={12} md={6}>
                             <Card raised >
-                                <CardMedia 
+                                <CardMedia
                                     image={restaurant.logo != "" ? restaurant.logo : NoImage}
                                     component="img"
                                     height="200"
@@ -443,23 +443,23 @@ export default function Restaurant(props) {
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row >
                         <Col xs={12} md={6}>
-                            <Button 
-                            variant="contained" 
-                            // disabled={isSubmitting} 
-                            size="large" 
-                            color="success" 
-                            type="submit" 
+                            <Button
+                            variant="contained"
+                            // disabled={isSubmitting}
+                            size="large"
+                            color="success"
+                            type="submit"
                             >
                                 Save
                             </Button>
                         </Col>
                     </Row>
-                </Form.Group> 
+                </Form.Group>
                 </Form>
             </Modal.Body>
         </Modal>
 
-        <MapsModal show={showModal} close={handleClose} id={1} /> 
+        <MapsModal show={showModal} close={handleClose} id={1} />
     </div>
   )
 }

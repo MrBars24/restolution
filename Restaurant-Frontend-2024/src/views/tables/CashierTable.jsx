@@ -58,7 +58,6 @@ export default function CashierTable({ rows, data, menus, tableRowRemove, onValU
 
     try {
       let update = await axiosClient.put('/web/cashier_update', payload);
-      console.log(update);
 
       Swal.fire({
           icon: 'success',
