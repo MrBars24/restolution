@@ -248,6 +248,7 @@ $results = $query->get();
         $orderBy = Arr::get($request, "order_by", "id");
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
+        $currentPage = Arr::get($request, "page", 0);
 
         $query = Ingredient::query();
 
