@@ -233,7 +233,7 @@ export default function Report() {
               if ("data" in response && Array.isArray(response.data.data)) {
                 // console.log(response.data);
                 // setData(response.data.data);
-                console.log(response.data.meta);
+                // console.log(response.data.meta);
                 setLoading(false);
 
                 resolve({
