@@ -22,6 +22,7 @@ export default function Menu({ fromReport = false }) {
   const [dateEndValue, setDateEndValue] = useState(defaultEndDate);
   const [restaurantOptions, setRestaurantOptions] = useState([...fixedOptions]);
 
+  const [ currentQuery, setCurrentQuery ] = useState({});
   const { user_ID, permission } = useStateContext();
   const location = useLocation()
   const [loading, setLoading] = useState(true)
@@ -140,6 +141,82 @@ export default function Menu({ fromReport = false }) {
     setMenuInfo([])
   }
 
+  const onPrint = async () => {
+    getTableData(null, true);
+  }
+
+  const getTableData = (query = null, isPrint = false) => {
+    return new Promise((resolve, reject) => {
+
+      let filters = [];
+
+      if (restaurantValue) {
+        filters.push({
+          column: "restaurant_id",
+          operator: "=",
+          value: restaurantValue.id
+        })
+      }
+
+      if (dateStartValue && dateEndValue) {
+        const formattedStartDate = format(new Date(dateStartValue), 'yyyy-MM-dd HH:mm:ss');
+        const formattedEndDate = format(new Date(dateEndValue), 'yyyy-MM-dd HH:mm:ss');
+
+        filters.push({
+          column: "created_at",
+          operator: "RANGE",
+          value: formattedStartDate + "_" + formattedEndDate
+        })
+      }
+
+      let qry = null;
+      if (query != null) {
+        qry = {
+          filters: filters,
+          order_by: query.orderBy?.field,
+          order_direction: query.orderBy?.tableData?.groupSort,
+          page: query.page,
+          per_page: query.pageSize
+        };
+
+        setCurrentQuery(qry);
+      } else {
+        qry = currentQuery;
+      }
+
+      axiosClient.get(`/web/menu/${user_ID}`, {
+        params: {
+          ...qry,
+          ...(isPrint && { print: true })
+        },
+        ...(isPrint && {responseType: "blob"})
+      }).then(response => {
+
+        if (isPrint) {
+          // let blob = new Blob([response.data]);
+          var file = new Blob([response.data], {type: 'application/pdf'});
+          var fileURL = URL.createObjectURL(file);
+          window.open(fileURL);
+          resolve();
+        }
+
+        if ("data" in response && Array.isArray(response.data.data)) {
+          // console.log(response.data);
+          // setData(response.data.data);
+          // console.log(response.data.meta);
+          setLoading(false);
+
+          resolve({
+                data: response.data.data,
+                page: response.data.meta.current_page - 1,
+                totalCount: response.data.meta.total
+
+          })
+        }
+      });
+    })
+  }
+
   const getRestaurant = async () => {
     try {
       const { data } = await axiosClient.get(`/web/restaurant/${user_ID}`)
@@ -252,7 +329,7 @@ export default function Menu({ fromReport = false }) {
                   />
                 </LocalizationProvider>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <Button
                   fullWidth
                   variant="contained"
@@ -267,58 +344,24 @@ export default function Menu({ fromReport = false }) {
                       Filter
                 </Button>
               </Grid>
+              <Grid item xs={1}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  // disabled={isSubmitting}
+                  size="large"
+                  color="primary"
+                  type="button"
+                  onClick={onPrint}
+                >
+                      Print
+                </Button>
+              </Grid>
             </Grid>
 
           )
         }}
-        data={fromReport ? query =>
-          new Promise((resolve, reject) => {
-
-          let filters = [];
-          if (fromReport) {
-            if (restaurantValue) {
-              filters.push({
-                column: "restaurant_id",
-                operator: "=",
-                value: restaurantValue.id
-              })
-            }
-
-            if (dateStartValue && dateEndValue) {
-              const formattedStartDate = format(new Date(dateStartValue), 'yyyy-MM-dd HH:mm:ss');
-              const formattedEndDate = format(new Date(dateEndValue), 'yyyy-MM-dd HH:mm:ss');
-
-              filters.push({
-                column: "created_at",
-                operator: "RANGE",
-                value: formattedStartDate + "_" + formattedEndDate
-              })
-            }
-          }
-
-          axiosClient
-          .get(`/web/menu/${user_ID}`, {
-              params: {
-                filters: filters,
-                order_by: query.orderBy?.field,
-                order_direction: query.orderBy?.tableData?.groupSort,
-                page: query.page,
-                per_page: query.pageSize
-              }
-            })
-            .then(response => {
-              if ("data" in response && Array.isArray(response.data.data)) {
-                // console.log(response.data);
-                // setData(response.data.data)
-                setLoading(false);
-                resolve({
-                  data: response.data.data,
-                  page: response.data.meta.current_page - 1,
-                  totalCount: response.data.meta.total
-                })
-              }
-            });
-        }) : menu.data}
+        data={fromReport ? query => getTableData(query) : menu.data}
         actions={fromReport ? [] : actions}
         options={options}
         isLoading={loading}

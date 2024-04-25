@@ -30,7 +30,9 @@
                         {{ $item->name}}
                     </td>
                     <td>
-                        {{ $item->ingredients}}
+                        {{ implode(', ', array_map(function ($ingredient) {
+                            return $ingredient->name;
+                        }, json_decode($item->ingredients)))}}
                     </td>
                     <td>
                         {{ $item->price}}

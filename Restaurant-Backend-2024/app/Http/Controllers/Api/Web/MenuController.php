@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\UserManager;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -93,6 +94,7 @@ class MenuController extends Controller
         $orderDirection = Arr::get($request, "order_direction", "desc");
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
+        $isPrint = Arr::get($request, "print", false);
 
         $query = Menu::query();
 
@@ -133,7 +135,14 @@ class MenuController extends Controller
                 ->where('restaurants.id', $resto_id);
         }
 
-        return MenuResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        if ($isPrint) {
+            $data = MenuResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+            $pdf = Pdf::loadView('menu_report_pdf', ['data' => $data]);
+            return $pdf->stream('test.pdf');
+        } else {
+            return MenuResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+        }
+
     }
 
     /**
