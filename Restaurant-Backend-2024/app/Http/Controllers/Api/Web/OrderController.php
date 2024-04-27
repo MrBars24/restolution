@@ -357,6 +357,7 @@ class OrderController extends Controller
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
         $isPrint = Arr::get($request, "print", false);
+        $dateRange = "";
 
         if ($role_id == 1) {
             $query = Order::with(['restaurant']);
@@ -369,6 +370,7 @@ class OrderController extends Controller
                         });
                     } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
                         [$start, $end] = explode("_", $value["value"]);
+                        $dateRange = Carbon::parse($start)->format("Y-m-d H:i A") . " - " . Carbon::parse($end)->format("Y-m-d H:i A");
                         $query->whereBetween("created_at", [$start, $end]);
                     } else {
                         $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
@@ -378,7 +380,7 @@ class OrderController extends Controller
 
             if ($isPrint) {
                 $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
+                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
                 return $pdf->stream('test.pdf');
             } else {
                 // dd($query->toSql());
@@ -415,7 +417,7 @@ class OrderController extends Controller
             // dd($query->toSql());
             if ($isPrint) {
                 $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
+                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
                 return $pdf->stream('test.pdf');
             } else {
                 return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
@@ -446,7 +448,7 @@ class OrderController extends Controller
 
             if ($isPrint) {
                 $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
+                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
                 return $pdf->stream('test.pdf');
             } else {
                 return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage));

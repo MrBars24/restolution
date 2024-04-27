@@ -1,4 +1,4 @@
-h4 {
+h4, h1 {
     margin: 0;
 }
 .w-full {
@@ -40,3 +40,4 @@ table tr.items td {
     margin-top: 1rem;
     font-size: 0.875rem;
 }
+

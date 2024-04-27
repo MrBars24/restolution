@@ -15,6 +15,7 @@ class TestController extends Controller
                 'price' => '129.00'
             ]
         ];
+        // return view('sales_report_pdf',  ['data' => $data]);
         $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data]);
 
         return $pdf->stream();
