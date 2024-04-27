@@ -10,6 +10,7 @@
 </head>
 <body>
     <h1>Ingredients Report</h1>
+    <span>{{ $date_range }}</span>
     <div class="margin-top">
         <table class="products">
             <tr>

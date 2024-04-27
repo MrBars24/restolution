@@ -370,7 +370,7 @@ class OrderController extends Controller
                         });
                     } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
                         [$start, $end] = explode("_", $value["value"]);
-                        $dateRange = Carbon::parse($start)->format("Y-m-d H:i A") . " - " . Carbon::parse($end)->format("Y-m-d H:i A");
+                        $dateRange = Carbon::parse($start)->format("Y-m-d h:i A") . " - " . Carbon::parse($end)->format("Y-m-d h:i A");
                         $query->whereBetween("created_at", [$start, $end]);
                     } else {
                         $query->where($value["column"], 'LIKE', "%{$value["value"]}%");

@@ -129,6 +129,7 @@ class PromoController extends Controller
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
         $isPrint = Arr::get($request, "print", false);
+        $dateRange = "";
 
         $query = Promo::query();
 
@@ -140,6 +141,7 @@ class PromoController extends Controller
                     });
                 } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
                     [$start, $end] = explode("_", $value["value"]);
+                    $dateRange = Carbon::parse($start)->format("Y-m-d h:i A") . " - " . Carbon::parse($end)->format("Y-m-d h:i A");
                     $query->whereBetween("promos.created_at", [$start, $end]);
                 } else {
                     $col = $value["column"];
@@ -181,7 +183,7 @@ class PromoController extends Controller
 
         if ($isPrint) {
             $data = PromoResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-            $pdf = Pdf::loadView('discount_report_pdf', ['data' => $data]);
+            $pdf = Pdf::loadView('discount_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
             return $pdf->stream('test.pdf');
         } else {
             return PromoResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));

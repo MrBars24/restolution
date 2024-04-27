@@ -251,6 +251,7 @@ $results = $query->get();
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
         $isPrint = Arr::get($request, "print", false);
+        $dateRange = "";
 
         $query = Ingredient::query();
 
@@ -262,6 +263,7 @@ $results = $query->get();
                     });
                 } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
                     [$start, $end] = explode("_", $value["value"]);
+                    $dateRange = Carbon::parse($start)->format("Y-m-d h:i A") . " - " . Carbon::parse($end)->format("Y-m-d h:i A");
                     $query->whereBetween("ingredients.created_at", [$start, $end]);
                 } else {
                     $col = $value["column"];
@@ -275,7 +277,7 @@ $results = $query->get();
         if ($role_id == 1) {
             if ($isPrint) {
                 $data = IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-                $pdf = Pdf::loadView('ingredients_report_pdf', ['data' => $data]);
+                $pdf = Pdf::loadView('ingredients_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
                 return $pdf->stream('test.pdf');
             } else {
                 // dd($query->toSql());
@@ -298,7 +300,7 @@ $results = $query->get();
 
         if ($isPrint) {
             $data = IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-            $pdf = Pdf::loadView('ingredients_report_pdf', ['data' => $data]);
+            $pdf = Pdf::loadView('ingredients_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
             return $pdf->stream('test.pdf');
         } else {
             return IngredientResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));

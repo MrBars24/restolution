@@ -73,13 +73,13 @@ export default function Sidebar() {
     if (permission.includes("Inventory Actual (Viewing)")) subMenuItems.push({ text: 'Actual', icon: <FiberManualRecordIcon fontSize='small' /> });
     if (permission.includes("Inventory Remaining (Viewing)")) subMenuItems.push({ text: 'Remaining', icon: <FiberManualRecordIcon fontSize='small' /> });
 
-    if (permission.includes("Reports (Sales)")) reportSubMenuItems.push({ text: 'Sales', icon: <FiberManualRecordIcon fontSize='small' />, route: "/sales-report" });
-    if (permission.includes("Reports (Ingredients)")) reportSubMenuItems.push({ text: 'Ingredients', icon: <FiberManualRecordIcon fontSize='small' />, route: "/ingredients-report" });
-    if (permission.includes("Reports (Menu)")) reportSubMenuItems.push({ text: 'Menu', icon: <FiberManualRecordIcon fontSize='small' />, route: "/menu-report" });
-    if (permission.includes("Reports (Discount)")) reportSubMenuItems.push({ text: 'Promo', icon: <FiberManualRecordIcon fontSize='small' />, route: "/promo-report" });
-    if (permission.includes("Reports (Reservations)")) reportSubMenuItems.push({ text: 'Reservation', icon: <FiberManualRecordIcon fontSize='small' />, route: "/reservation-report" });
-    if (permission.includes("Reports (Inventory)")) reportSubMenuItems.push({ text: 'Inventory', icon: <FiberManualRecordIcon fontSize='small' />, route: "/inventory-report" });
-    if (permission.includes("Reports (User)")) reportSubMenuItems.push({ text: 'User', icon: <FiberManualRecordIcon fontSize='small' />, route: "/user-report" });
+    if (permission.includes("Reports (Sales)")) reportSubMenuItems.push({ text: 'Sales Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/sales-report" });
+    if (permission.includes("Reports (Ingredients)")) reportSubMenuItems.push({ text: 'Ingredients Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/ingredients-report" });
+    if (permission.includes("Reports (Menu)")) reportSubMenuItems.push({ text: 'Menu Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/menu-report" });
+    if (permission.includes("Reports (Discount)")) reportSubMenuItems.push({ text: 'Promo Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/promo-report" });
+    if (permission.includes("Reports (Reservations)")) reportSubMenuItems.push({ text: 'Reservation Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/reservation-report" });
+    if (permission.includes("Reports (Inventory)")) reportSubMenuItems.push({ text: 'Inventory Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/inventory-report" });
+    if (permission.includes("Reports (User)")) reportSubMenuItems.push({ text: 'User Report', icon: <FiberManualRecordIcon fontSize='small' />, route: "/user-report" });
 
     useEffect(() => {
         if (!selectedItem && path) {

@@ -11,6 +11,7 @@ use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\UserManager;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +89,7 @@ class ReserveController extends Controller
         $perPage = Arr::get($request, "per_page", 0);
         $currentPage = Arr::get($request, "page", 0);
         $isPrint = Arr::get($request, "print", false);
+        $dateRange = "";
 
         $query = Reservation::query();
 
@@ -99,6 +101,7 @@ class ReserveController extends Controller
                     });
                 } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
                     [$start, $end] = explode("_", $value["value"]);
+                    $dateRange = Carbon::parse($start)->format("Y-m-d h:i A") . " - " . Carbon::parse($end)->format("Y-m-d h:i A");
                     $query->whereBetween("reservations.created_at", [$start, $end]);
                 } else {
                     $col = $value["column"];
@@ -133,7 +136,7 @@ class ReserveController extends Controller
 
         if ($isPrint) {
             $data = ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-            $pdf = Pdf::loadView('reservation_report_pdf', ['data' => $data]);
+            $pdf = Pdf::loadView('reservation_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
             return $pdf->stream('test.pdf');
         } else {
             return ReservationResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
