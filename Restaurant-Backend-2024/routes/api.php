@@ -14,8 +14,10 @@ use App\Http\Controllers\Api\Web\RestaurantController;
 use App\Http\Controllers\Api\Web\SystemInventoryController;
 use App\Http\Controllers\Api\Web\UserController;
 use App\Http\Controllers\Kitchen\Order;
+use App\Http\Controllers\TableController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Prompts\Table;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +58,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('/web/actual_inventory', ActualInventoryController::class);
     Route::resource('/web/reservation', ReserveController::class);
 
+    // waiter app
+    Route::get('/table-status/{restaurant}', [TableController::class, 'getTablesStatus']);
+    Route::get('/table-status/{restaurant}/{tableNumber}', [TableController::class, 'getTableStatus']);
 
     // Get category for sample
     Route::get('/web/category_sample/{id}', [UserController::class, 'sample']);
