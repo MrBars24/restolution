@@ -4,13 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Restaurant;
+use App\Models\UserManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
 {
     public function getTablesStatus(Request $request, Restaurant $restaurant)
     {
+        if (!isset($restaurant->id)) {
+            $manager = UserManager::where('user_id', Auth::user()->id)->first();
+            $restaurant = $manager->restaurant;
+        }
+
         $tables = Order::join(
                DB::raw('(SELECT table_number, MAX(id) maxId FROM orders GROUP BY table_number) latest_row'),
                function ($join) {
@@ -24,7 +31,7 @@ class TableController extends Controller
         for ($i = 1; $i <= $restaurant->table_number; $i++) {
             $tmpData = $this->getData($tables, $i);
 
-            if (empty($tmpData)) {
+            if (empty($tmpData) || $tmpData['status'] === "Completed") {
                 $summary['available'] = $summary['available'] + 1;
             } else {
                 $summary['occupied'] = $summary['occupied'] + 1;

@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Web\RestaurantController;
 use App\Http\Controllers\Api\Web\SystemInventoryController;
 use App\Http\Controllers\Api\Web\UserController;
 use App\Http\Controllers\Kitchen\Order;
+use App\Http\Controllers\KitchenOrderController;
 use App\Http\Controllers\TableController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('/web/reservation', ReserveController::class);
 
     // waiter app
+    Route::get('/table-status', [TableController::class, 'getTablesStatus']);
     Route::get('/table-status/{restaurant}', [TableController::class, 'getTablesStatus']);
     Route::get('/table-status/{restaurant}/{tableNumber}', [TableController::class, 'getTableStatus']);
 
@@ -96,6 +98,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/kitchen/orders', [KitchenOrderController::class, 'getList']);
+    Route::put('/kitchen/order/{order}', [KitchenOrderController::class, 'update']);
 });
 // Input Voucher Code
 Route::get('/web/voucher/{id}', [PromoController::class, 'voucher']);

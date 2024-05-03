@@ -18,6 +18,7 @@ class Order extends Model
         'dine_in_out',
         'payment_method',
         'status',
+        'kitchen_status',
         'total_amount',
         'discount_amount',
         'special_discount_amount',

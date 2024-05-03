@@ -322,6 +322,7 @@ class OrderController extends Controller
         $data = $request->validated();
         $data['menu'] = json_encode($request->menu);
 
+        $data['kitchen_status'] = $request->status;
         $table_taken = Order::where('restaurant_id', $request->restaurant_id)
                         ->where('table_number' , $request->table_number)->where('status', '!=', 'Completed')->first();
 
