@@ -61,8 +61,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // waiter app
     Route::get('/table-status', [TableController::class, 'getTablesStatus']);
-    Route::get('/table-status/{restaurant}', [TableController::class, 'getTablesStatus']);
-    Route::get('/table-status/{restaurant}/{tableNumber}', [TableController::class, 'getTableStatus']);
+    Route::get('/table-status/{tableNumber}', [TableController::class, 'getTableStatus']);
+    // Route::get('/table-status/{restaurant}', [TableController::class, 'getTablesStatus']);
+    // Route::get('/table-status/{restaurant}/{tableNumber}', [TableController::class, 'getTableStatus']);
 
     // Get category for sample
     Route::get('/web/category_sample/{id}', [UserController::class, 'sample']);

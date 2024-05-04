@@ -18,6 +18,13 @@ class KitchenOrderController extends Controller
         $query = Order::where('restaurant_id', $restaurant->id);
 
         if ($request->exists('kitchen_status')) {
+            // validate statuses
+            if (!in_array($request->kitchen_status, ["New Order", "In Process", "Completed"])) {
+                return response()->json([
+                    'message' => 'Invalid status'
+                ], 403);
+            }
+
             $query->where('kitchen_status', $request->kitchen_status);
         }
 
@@ -30,6 +37,15 @@ class KitchenOrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        if ($request->exists('kitchen_status')) {
+            // validate statuses
+            if (!in_array($request->kitchen_status, ["New Order", "In Process", "Completed"])) {
+                return response()->json([
+                    'message' => 'Invalid status'
+                ], 403);
+            }
+        }
+
         if ($request->kitchen_status === "In Process") {
             $order->status = 'In Process';
         }

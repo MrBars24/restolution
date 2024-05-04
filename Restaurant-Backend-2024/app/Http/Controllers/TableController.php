@@ -11,12 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
 {
-    public function getTablesStatus(Request $request, Restaurant $restaurant)
+    public function getTablesStatus(Request $request)
     {
-        if (!isset($restaurant->id)) {
-            $manager = UserManager::where('user_id', Auth::user()->id)->first();
-            $restaurant = $manager->restaurant;
-        }
+        $manager = UserManager::where('user_id', Auth::user()->id)->first();
+        $restaurant = $manager->restaurant;
 
         $tables = Order::join(
                DB::raw('(SELECT table_number, MAX(id) maxId FROM orders GROUP BY table_number) latest_row'),
@@ -46,8 +44,11 @@ class TableController extends Controller
         ]);
     }
 
-    public function getTableStatus(Request $request, Restaurant $restaurant, $tableNumber)
+    public function getTableStatus(Request $request, $tableNumber)
     {
+        $manager = UserManager::where('user_id', Auth::user()->id)->first();
+        $restaurant = $manager->restaurant;
+
         $table = Order::select(['orders.*'])
             ->join(
                 DB::raw('(SELECT table_number, MAX(id) maxId FROM orders GROUP BY table_number) latest_row'),
