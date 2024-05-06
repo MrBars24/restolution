@@ -357,7 +357,7 @@ export default function Restaurant(props) {
                     </Col>
                   </Row>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                {/* <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                   <Row>
                     <Col xs={12} md={6}>
                       <TextField
@@ -387,7 +387,7 @@ export default function Restaurant(props) {
                         </IconButton>
                     </Col>
                   </Row>
-                </Form.Group>
+                </Form.Group> */}
                 { role == 1 &&
                   <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Row>
