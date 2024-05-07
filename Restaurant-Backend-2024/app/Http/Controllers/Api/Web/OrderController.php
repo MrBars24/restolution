@@ -395,34 +395,41 @@ class OrderController extends Controller
             //             ->where('restaurants.corporate_account', $id)
             //             ->orderBy('id','desc')->get()
             //  );
-            $restaurant = Restaurant::where('corporate_account', $user['id'])->first();
+            $restaurant = null;//Restaurant::where('corporate_account', $user['id'])->first();
 
-            $query = Order::with(['restaurant'])
-                    ->where('restaurant_id', $restaurant->id);
+            if ($restaurant) {
+                $query = Order::with(['restaurant'])
+                        ->where('restaurant_id', $restaurant->id);
 
-            if ($request->has("filters")) {
-                foreach ($filters as $key => $value) {
-                    if ($value["column"] === "restaurant.name") {
-                        $query->whereHas('restaurant', function ($q) use ($value) {
-                            $q->where('name', 'LIKE', "%{$value["value"]}%");
-                        });
-                    } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
-                        [$start, $end] = explode("_", $value["value"]);
-                        $query->whereBetween("created_at", [$start, $end]);
-                    } else {
-                        $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
+                if ($request->has("filters")) {
+                    foreach ($filters as $key => $value) {
+                        if ($value["column"] === "restaurant.name") {
+                            $query->whereHas('restaurant', function ($q) use ($value) {
+                                $q->where('name', 'LIKE', "%{$value["value"]}%");
+                            });
+                        } else if ($value["column"] === "created_at" && $value["operator"] == "RANGE") {
+                            [$start, $end] = explode("_", $value["value"]);
+                            $query->whereBetween("created_at", [$start, $end]);
+                        } else {
+                            $query->where($value["column"], 'LIKE', "%{$value["value"]}%");
+                        }
                     }
                 }
+
+                // dd($query->toSql());
+                if ($isPrint) {
+                    $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
+                    $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
+                    return $pdf->stream('test.pdf');
+                } else {
+                    return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
+                }
+            } else {
+                return response([
+                    'data' => []
+                ], 200);
             }
 
-            // dd($query->toSql());
-            if ($isPrint) {
-                $data = OrderResource::collection($query->orderBy($orderBy, $orderDirection)->get());
-                $pdf = Pdf::loadView('sales_report_pdf', ['data' => $data, 'date_range' => $dateRange]);
-                return $pdf->stream('test.pdf');
-            } else {
-                return OrderResource::collection($query->orderBy($orderBy, $orderDirection)->paginate($perPage, $columns = ['*'], $pageName = 'page', $currentPage + 1));
-            }
         } else if ($role_id > 2) {
             $restaurant = UserManager::where('user_id', $user['id'])->first();
             $restaurant_id = $restaurant['restaurant_id'];
