@@ -234,7 +234,7 @@ class UserController extends Controller
                 ->select('users.*', 'user_permissions.permission', 'restaurants.id as restaurant_id', 'restaurants.name as restaurant_name', 'corporate_restrictions.allowed_restaurant', 'corporate_restrictions.allowed_bm');
         } else if ($role_id == 2) {
             $restaurant = Restaurant::where('corporate_account', $id)->first();
-            $resto_id = $restaurant['id'];
+            $resto_id = isset($restaurant['id']) ? $restaurant['id'] : 0;
 
             $query->leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
                 ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
@@ -243,7 +243,7 @@ class UserController extends Controller
                 ->where('restaurants.id', $resto_id);
         } else {
             $restaurant = UserManager::where('user_id', $id)->first();
-            $resto_id = $restaurant['restaurant_id'];
+            $resto_id = isset($restaurant['id']) ? $restaurant['id'] : 0;
 
             $query->leftjoin('user_permissions', 'user_permissions.user_id', 'users.id')
                 ->leftjoin('user_managers', 'user_managers.user_id', 'users.id')
