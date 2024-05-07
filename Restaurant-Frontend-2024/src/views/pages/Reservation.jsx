@@ -196,8 +196,8 @@ export default function Reservation({ fromReport = false }) {
 
             resolve({
                   data: response.data.data,
-                  page: response.data.meta.current_page - 1,
-                  totalCount: response.data.meta.total
+                  page: "meta" in response.data ? response.data.meta.current_page - 1 : 0,
+                  totalCount: "meta" in response.data ? response.data.meta.total : 0
 
             })
           }
